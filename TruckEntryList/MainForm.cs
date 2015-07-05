@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -59,6 +60,7 @@ namespace TruckEntryList
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            CreateRaport();
             lstTruckOrder.Items.Clear();
 
             presenter = new Presenter(this);
@@ -72,6 +74,103 @@ namespace TruckEntryList
             regUpdater.Tick += RegUpdater_Tick;
             regUpdater.Interval = 1000;
             regUpdater.Start();
+
+            Timer raportTimer = new Timer();
+            raportTimer.Interval = (int)(new TimeSpan(24, 0, 0) - new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second)).TotalMilliseconds;
+            raportTimer.Tick += RaportTimer_Tick;
+            raportTimer.Start();
+        }
+
+        private void RaportTimer_Tick(object sender, EventArgs e)
+        {
+            ((Timer)sender).Interval = (int)new TimeSpan(24, 0, 0).TotalMilliseconds;
+
+            CreateRaport();
+        }
+
+        private void CreateRaport()
+        {
+            string dataRaport = DateTime.Now.Hour == 0 ? (DateTime.Now.Day - 1).ToString("00") + "" : DateTime.Now.Day.ToString("00") + "";
+            dataRaport += "." + DateTime.Now.Month.ToString("00") + "." + DateTime.Now.Year;
+
+            string fileName = Path.GetFullPath(@".\Rapoarte\Raport " + dataRaport + ".xlsx");
+            FileInfo file = new FileInfo(fileName);
+            file.Directory.Create();
+
+            Microsoft.Office.Interop.Excel.Application excelApp = null;
+            _Workbook excelWb = null;
+            try
+            {
+                excelApp = new Microsoft.Office.Interop.Excel.Application();
+                excelApp.Visible = false;
+                excelApp.UserControl = false;
+                excelWb = excelApp.Workbooks.Add("");
+                _Worksheet excelWs = excelWb.ActiveSheet;
+
+                excelWs.Range[excelWs.Cells[1, 1], excelWs.Cells[1, 5]].Merge();
+
+
+
+                excelWs.Cells[1, 1] = "Raport pentru ziua: " + dataRaport;
+
+
+                excelWs.Cells[3, 1] = "Nr. Crt.";
+                AddBorder(excelWs.Cells[3, 1], XlBorderWeight.xlThick);
+
+                excelWs.Cells[3, 2] = "Nr. Auto";
+                AddBorder(excelWs.Cells[3, 2], XlBorderWeight.xlThick);
+
+                excelWs.Cells[3, 3] = "Marfa";
+                AddBorder(excelWs.Cells[3, 3], XlBorderWeight.xlThick);
+
+                excelWs.Cells[3, 4] = "Data Inregistrare";
+                AddBorder(excelWs.Cells[3, 4], XlBorderWeight.xlThick);
+
+                excelWs.Cells[3, 5] = "Data Intrare";
+                AddBorder(excelWs.Cells[3, 5], XlBorderWeight.xlThick);
+
+
+                string[] lines = File.ReadAllLines(completedFile);
+                TruckInfo ti;
+                int i = 1;
+                foreach(string line in lines)
+                {
+                    if (TruckInfo.TryParse(line, out ti))
+                    {
+                        if (!(ti.dateRegistered.Day == DateTime.Now.Day || ti.dateRegistered.Day == DateTime.Now.Day - 1))
+                            continue;
+
+                        excelWs.Cells[3 + i, 1] = i;
+                        excelWs.Cells[3 + i, 2] = ti.nrAuto;
+                        excelWs.Cells[3 + i, 3] = ti.payload;
+                        excelWs.Cells[3 + i, 4] = ti.dateRegistered;
+                        excelWs.Cells[3 + i, 5] = ti.dateEntry;
+                        i++;
+                    }
+                }
+
+                excelWs.Range[excelWs.Cells[1, 1], excelWs.Cells[1, 5]].EntireColumn.AutoFit();
+                excelWb.SaveAs(fileName, XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing,
+                                false, false, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+
+                excelWb.Close();
+                excelApp.Quit();
+
+            }
+            catch (Exception ex)
+            {
+                if (excelWb != null)
+                    excelWb.Close();
+                if (excelApp != null)
+                    excelApp.Quit();
+            }
+        }
+
+        private void AddBorder(Range cell, XlBorderWeight weight)
+        {
+            Borders border = cell.Borders;
+            border.LineStyle = XlLineStyle.xlContinuous;
+            border.Weight = weight;
         }
 
         private void RegUpdater_Tick(object sender, EventArgs e)

@@ -33,7 +33,7 @@ namespace TruckEntryList
             result = null;
             var itemProps = s.Split('|');
 
-            if (itemProps.Length == 4)
+            if (itemProps.Length == 4 || itemProps.Length == 5)
             {
                 TruckInfo ti = new TruckInfo();
 
@@ -57,6 +57,19 @@ namespace TruckEntryList
                 {
                     return false;
                 }
+
+                if(itemProps.Length == 5)
+                {
+                    if (DateTime.TryParse(itemProps[4], out time))
+                    {
+                        ti.dateEntry = time;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
                 result = ti;
                 return true;
             }

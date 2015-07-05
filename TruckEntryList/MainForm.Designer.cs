@@ -141,6 +141,7 @@
             // cmdNext
             // 
             this.cmdNext.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.cmdNext.ForeColor = System.Drawing.Color.Blue;
             this.cmdNext.Location = new System.Drawing.Point(147, 164);
             this.cmdNext.Name = "cmdNext";
             this.cmdNext.Size = new System.Drawing.Size(75, 26);
@@ -218,9 +219,10 @@
             // cmdShowPresenter
             // 
             this.cmdShowPresenter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.cmdShowPresenter.ForeColor = System.Drawing.Color.Green;
             this.cmdShowPresenter.Location = new System.Drawing.Point(12, 132);
             this.cmdShowPresenter.Name = "cmdShowPresenter";
-            this.cmdShowPresenter.Size = new System.Drawing.Size(100, 26);
+            this.cmdShowPresenter.Size = new System.Drawing.Size(129, 26);
             this.cmdShowPresenter.TabIndex = 5;
             this.cmdShowPresenter.Text = "Arata Afisajul";
             this.cmdShowPresenter.UseVisualStyleBackColor = true;
@@ -228,9 +230,10 @@
             // 
             // cmdSettings
             // 
+            this.cmdSettings.ForeColor = System.Drawing.Color.Red;
             this.cmdSettings.Location = new System.Drawing.Point(12, 167);
             this.cmdSettings.Name = "cmdSettings";
-            this.cmdSettings.Size = new System.Drawing.Size(75, 23);
+            this.cmdSettings.Size = new System.Drawing.Size(51, 23);
             this.cmdSettings.TabIndex = 101;
             this.cmdSettings.Text = "Setari";
             this.cmdSettings.UseVisualStyleBackColor = true;
