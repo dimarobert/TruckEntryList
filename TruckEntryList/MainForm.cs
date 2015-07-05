@@ -18,6 +18,8 @@ namespace TruckEntryList
         private StreamWriter logFile;
         private const string completedFile = "./completedFile.dat";
 
+        private Presenter presenter;
+
         private List<TruckInfo> entryData;
         public List<TruckInfo> EntryData
         {
@@ -59,8 +61,8 @@ namespace TruckEntryList
         {
             lstTruckOrder.Items.Clear();
 
-            Presenter pr = new Presenter(this);
-            pr.Show();
+            presenter = new Presenter(this);
+            presenter.Show();
 
             LoadData();
 
@@ -284,32 +286,32 @@ namespace TruckEntryList
             }
         }
 
-        /* Flex Font
-        public static Font FlexFont(Graphics g, float minFontSize, float maxFontSize, Size layoutSize, string s, Font f, out SizeF extent)
+        private void cmdShowPresenter_Click(object sender, EventArgs e)
         {
-            if (maxFontSize == minFontSize)
-                f = new Font(f.FontFamily, minFontSize, f.Style);
+            if (presenter != null)
+            {
+                if (!presenter.Visible)
+                {
+                    presenter.Dispose();
+                    presenter = new Presenter(this);
+                    presenter.UpdatePresenterSettings();
+                    presenter.Show();
+                }
+            }
+            else
+            {
+                presenter = new Presenter(this);
+                presenter.Show();
+            }
+        }
 
-            extent = g.MeasureString(s, f);
+        private void cmdSettings_Click(object sender, EventArgs e)
+        {
+            Settings settings = new Settings();
+            settings.ShowDialog();
 
-            if (maxFontSize <= minFontSize)
-                return f;
-
-            float hRatio = layoutSize.Height / extent.Height;
-            float wRatio = layoutSize.Width / extent.Width;
-            float ratio = (hRatio < wRatio) ? hRatio : wRatio;
-
-            float newSize = f.Size * ratio;
-
-            if (newSize < minFontSize)
-                newSize = minFontSize;
-            else if (newSize > maxFontSize)
-                newSize = maxFontSize;
-
-            f = new Font(f.FontFamily, newSize, f.Style);
-            extent = g.MeasureString(s, f);
-
-            return f;
-        }*/
+            if (presenter != null)
+                presenter.UpdatePresenterSettings();
+        }
     }
 }

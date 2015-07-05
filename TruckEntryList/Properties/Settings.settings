@@ -2,8 +2,20 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TruckEntryList.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="nrcrtdb" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Nr.Crt.</Value>
+    <Setting Name="hourZone" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">0.2</Value>
+    </Setting>
+    <Setting Name="nrAutoZone" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">0.45</Value>
+    </Setting>
+    <Setting Name="payloadZone" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">0.25</Value>
+    </Setting>
+    <Setting Name="nextTrucksZone" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">0.1</Value>
+    </Setting>
+    <Setting Name="settingsFilePath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">./settings.dat</Value>
     </Setting>
   </Settings>
 </SettingsFile>

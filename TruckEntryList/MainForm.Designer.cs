@@ -34,6 +34,7 @@
             "CL-999-DDD",
             "Rapita",
             "24:99:99 99.99.9999"}, -1);
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.cmdAdd = new System.Windows.Forms.Button();
             this.txtNrAuto = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -51,16 +52,17 @@
             this.txtPayload = new System.Windows.Forms.ComboBox();
             this.mnuTruckList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cmdRemTruck = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmdShowPresenter = new System.Windows.Forms.Button();
+            this.cmdSettings = new System.Windows.Forms.Button();
             this.mnuTruckList.SuspendLayout();
             this.SuspendLayout();
             // 
             // cmdAdd
             // 
             this.cmdAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.cmdAdd.Location = new System.Drawing.Point(196, 162);
-            this.cmdAdd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdAdd.Location = new System.Drawing.Point(147, 132);
             this.cmdAdd.Name = "cmdAdd";
-            this.cmdAdd.Size = new System.Drawing.Size(100, 32);
+            this.cmdAdd.Size = new System.Drawing.Size(75, 26);
             this.cmdAdd.TabIndex = 4;
             this.cmdAdd.Text = "Adauga";
             this.cmdAdd.UseVisualStyleBackColor = true;
@@ -70,20 +72,18 @@
             // 
             this.txtNrAuto.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.txtNrAuto.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.txtNrAuto.Location = new System.Drawing.Point(163, 63);
-            this.txtNrAuto.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtNrAuto.Location = new System.Drawing.Point(122, 51);
             this.txtNrAuto.Name = "txtNrAuto";
-            this.txtNrAuto.Size = new System.Drawing.Size(132, 24);
+            this.txtNrAuto.Size = new System.Drawing.Size(100, 21);
             this.txtNrAuto.TabIndex = 1;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label1.Location = new System.Drawing.Point(16, 27);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(12, 22);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(119, 20);
+            this.label1.Size = new System.Drawing.Size(100, 17);
             this.label1.TabIndex = 100;
             this.label1.Text = "Numar Curent:";
             // 
@@ -91,10 +91,9 @@
             // 
             this.lblNrCrt.AutoSize = true;
             this.lblNrCrt.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblNrCrt.Location = new System.Drawing.Point(157, 23);
-            this.lblNrCrt.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblNrCrt.Location = new System.Drawing.Point(118, 19);
             this.lblNrCrt.Name = "lblNrCrt";
-            this.lblNrCrt.Size = new System.Drawing.Size(46, 26);
+            this.lblNrCrt.Size = new System.Drawing.Size(38, 22);
             this.lblNrCrt.TabIndex = 100;
             this.lblNrCrt.Text = "NR";
             // 
@@ -102,10 +101,9 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label3.Location = new System.Drawing.Point(64, 66);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Location = new System.Drawing.Point(48, 54);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(75, 20);
+            this.label3.Size = new System.Drawing.Size(64, 17);
             this.label3.TabIndex = 100;
             this.label3.Text = "Nr. Auto:";
             // 
@@ -113,10 +111,9 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label4.Location = new System.Drawing.Point(85, 100);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label4.Location = new System.Drawing.Point(64, 81);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(57, 20);
+            this.label4.Size = new System.Drawing.Size(48, 17);
             this.label4.TabIndex = 100;
             this.label4.Text = "Marfa:";
             // 
@@ -124,10 +121,9 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label5.Location = new System.Drawing.Point(24, 132);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label5.Location = new System.Drawing.Point(18, 107);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(112, 20);
+            this.label5.Size = new System.Drawing.Size(94, 17);
             this.label5.TabIndex = 100;
             this.label5.Text = "Ora Inscriere:";
             // 
@@ -136,20 +132,18 @@
             this.dateRegister.Enabled = false;
             this.dateRegister.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.dateRegister.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.dateRegister.Location = new System.Drawing.Point(163, 129);
-            this.dateRegister.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateRegister.Location = new System.Drawing.Point(122, 105);
             this.dateRegister.Name = "dateRegister";
             this.dateRegister.ShowUpDown = true;
-            this.dateRegister.Size = new System.Drawing.Size(132, 24);
+            this.dateRegister.Size = new System.Drawing.Size(100, 21);
             this.dateRegister.TabIndex = 3;
             // 
             // cmdNext
             // 
             this.cmdNext.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.cmdNext.Location = new System.Drawing.Point(196, 202);
-            this.cmdNext.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdNext.Location = new System.Drawing.Point(147, 164);
             this.cmdNext.Name = "cmdNext";
-            this.cmdNext.Size = new System.Drawing.Size(100, 32);
+            this.cmdNext.Size = new System.Drawing.Size(75, 26);
             this.cmdNext.TabIndex = 5;
             this.cmdNext.Text = "Urmatorul";
             this.cmdNext.UseVisualStyleBackColor = true;
@@ -165,11 +159,10 @@
             this.lstTruckOrder.FullRowSelect = true;
             this.lstTruckOrder.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1});
-            this.lstTruckOrder.Location = new System.Drawing.Point(304, 15);
-            this.lstTruckOrder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstTruckOrder.Location = new System.Drawing.Point(228, 12);
             this.lstTruckOrder.MultiSelect = false;
             this.lstTruckOrder.Name = "lstTruckOrder";
-            this.lstTruckOrder.Size = new System.Drawing.Size(424, 218);
+            this.lstTruckOrder.Size = new System.Drawing.Size(319, 178);
             this.lstTruckOrder.TabIndex = 6;
             this.lstTruckOrder.UseCompatibleStateImageBehavior = false;
             this.lstTruckOrder.View = System.Windows.Forms.View.Details;
@@ -202,10 +195,9 @@
             "Floarea Soarelui",
             "Soia",
             "Biodiesel"});
-            this.txtPayload.Location = new System.Drawing.Point(163, 96);
-            this.txtPayload.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtPayload.Location = new System.Drawing.Point(122, 78);
             this.txtPayload.Name = "txtPayload";
-            this.txtPayload.Size = new System.Drawing.Size(132, 24);
+            this.txtPayload.Size = new System.Drawing.Size(100, 21);
             this.txtPayload.TabIndex = 2;
             // 
             // mnuTruckList
@@ -214,20 +206,42 @@
             this.mnuTruckList.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.cmdRemTruck});
             this.mnuTruckList.Name = "mnuTruckList";
-            this.mnuTruckList.Size = new System.Drawing.Size(122, 28);
+            this.mnuTruckList.Size = new System.Drawing.Size(108, 26);
             // 
             // cmdRemTruck
             // 
             this.cmdRemTruck.Name = "cmdRemTruck";
-            this.cmdRemTruck.Size = new System.Drawing.Size(121, 24);
+            this.cmdRemTruck.Size = new System.Drawing.Size(107, 22);
             this.cmdRemTruck.Text = "Sterge";
             this.cmdRemTruck.Click += new System.EventHandler(this.cmdRemTruck_Click);
             // 
+            // cmdShowPresenter
+            // 
+            this.cmdShowPresenter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.cmdShowPresenter.Location = new System.Drawing.Point(12, 132);
+            this.cmdShowPresenter.Name = "cmdShowPresenter";
+            this.cmdShowPresenter.Size = new System.Drawing.Size(100, 26);
+            this.cmdShowPresenter.TabIndex = 5;
+            this.cmdShowPresenter.Text = "Arata Afisajul";
+            this.cmdShowPresenter.UseVisualStyleBackColor = true;
+            this.cmdShowPresenter.Click += new System.EventHandler(this.cmdShowPresenter_Click);
+            // 
+            // cmdSettings
+            // 
+            this.cmdSettings.Location = new System.Drawing.Point(12, 167);
+            this.cmdSettings.Name = "cmdSettings";
+            this.cmdSettings.Size = new System.Drawing.Size(75, 23);
+            this.cmdSettings.TabIndex = 101;
+            this.cmdSettings.Text = "Setari";
+            this.cmdSettings.UseVisualStyleBackColor = true;
+            this.cmdSettings.Click += new System.EventHandler(this.cmdSettings_Click);
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(745, 249);
+            this.ClientSize = new System.Drawing.Size(559, 202);
+            this.Controls.Add(this.cmdSettings);
             this.Controls.Add(this.txtPayload);
             this.Controls.Add(this.lstTruckOrder);
             this.Controls.Add(this.dateRegister);
@@ -237,10 +251,11 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtNrAuto);
+            this.Controls.Add(this.cmdShowPresenter);
             this.Controls.Add(this.cmdNext);
             this.Controls.Add(this.cmdAdd);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "Truck Entry List";
@@ -270,6 +285,8 @@
         private System.Windows.Forms.ComboBox txtPayload;
         private System.Windows.Forms.ContextMenuStrip mnuTruckList;
         private System.Windows.Forms.ToolStripMenuItem cmdRemTruck;
+        private System.Windows.Forms.Button cmdShowPresenter;
+        private System.Windows.Forms.Button cmdSettings;
     }
 }
 

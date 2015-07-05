@@ -13,24 +13,36 @@ namespace TruckEntryList
     {
 
         MainForm parent;
+        FormWindowState windowState;
+        Size lastNormalSize;
+        Point lastNormalLocation;
 
         public Presenter(Form owner)
         {
-            this.Owner = owner;
             InitializeComponent();
-            this.ClientSize = new Size(937, 668);
-            this.lstTruckOrder.Size = new Size(331, 642);
 
             label1.Visible = false;
             lblHour.Text = DateTime.Now.ToString("dd.MM.yyyy\nHH:MM:ss");
+            lstTruckOrder.Items.Clear();
+            lblNrAuto.Text = "";
+            lblPayload.Text = "";
+            lblNextTruck.Text = "";
 
-            parent = (MainForm)this.Owner;
+            parent = (MainForm)owner;
             parent.PropertyChanged += Parent_PropertyChanged;
+            UpdateData();
 
             Timer hourTimer = new Timer();
             hourTimer.Tick += HourTimer_Tick;
             hourTimer.Interval = 1000;
             hourTimer.Start();
+
+            windowState = WindowState;
+        }
+
+        public void UpdatePresenterSettings()
+        {
+            UpdateDisplay();
         }
 
         private static Screen GetCurrentScreen(Form form)
@@ -58,12 +70,17 @@ namespace TruckEntryList
                 // Check your window state here
                 if (m.WParam == new IntPtr(0xF030)) // Maximize event - SC_MAXIMIZE from Winuser.h
                 {
-                    this.WindowState = FormWindowState.Maximized;
+                    this.windowState = FormWindowState.Maximized;
                     WindowMaximize();
                 }
                 if (m.WParam == new IntPtr(0xF120))
                 {
-                    this.WindowState = FormWindowState.Normal;
+                    this.windowState = FormWindowState.Normal;
+                    WindowMaximize();
+                }
+                if(m.WParam == new IntPtr(0xF020))
+                {
+                    this.windowState = FormWindowState.Minimized;
                     WindowMaximize();
                 }
             }
@@ -72,22 +89,41 @@ namespace TruckEntryList
 
         private void WindowMaximize()
         {
-            if (this.WindowState == FormWindowState.Maximized)
+            if (this.windowState == FormWindowState.Maximized)
             {
+                this.WindowState = FormWindowState.Normal;
                 this.FormBorderStyle = FormBorderStyle.None;
+
+                lastNormalSize = this.Size;
+                lastNormalLocation = this.Location;
+
+                this.Location = new Point(0, 0);
+                Screen currentScreen = GetCurrentScreen(this);
+                this.Size = new Size(currentScreen.WorkingArea.Width, currentScreen.WorkingArea.Height);
+
                 label1.Visible = true;
                 label1.Location = new Point(10, 10);
             }
-            else
+            else if(this.windowState == FormWindowState.Normal)
             {
+                this.WindowState = FormWindowState.Normal;
                 this.FormBorderStyle = FormBorderStyle.Sizable;
+
+                this.Location = lastNormalLocation;
+                this.Size = lastNormalSize;
+
                 label1.Visible = false;
             }
+            else if(this.windowState == FormWindowState.Minimized)
+            {
+                this.WindowState = FormWindowState.Minimized;
+            }
         }
-
-
+        
         private void Presenter_Load(object sender, EventArgs e)
         {
+            lastNormalSize = this.Size;
+            lastNormalLocation = this.Location;
             UpdateDisplay();
         }
 
@@ -104,10 +140,10 @@ namespace TruckEntryList
 
             availableArea.Width = lstTruckOrder.Location.X;
 
-            int hourHeight = (int)(availableArea.Height * 0.2);
-            int nrAutoHeight = (int)(availableArea.Height * 0.45);
-            int payloadHeight = (int)(availableArea.Height * 0.25);
-            int nextTrucksHeight = (int)(availableArea.Height * 0.1);
+            int hourHeight = (int)(availableArea.Height * PresenterSettings.hourZone);
+            int nrAutoHeight = (int)(availableArea.Height * PresenterSettings.nrAutoZone);
+            int payloadHeight = (int)(availableArea.Height * PresenterSettings.payloadZone);
+            int nextTrucksHeight = (int)(availableArea.Height * PresenterSettings.nextTrucksZone);
 
 
 
@@ -127,7 +163,7 @@ namespace TruckEntryList
             lblPayload.Size = new Size(availableArea.Width, payloadHeight);
             UpdateLabelFontSize(lblPayload);
             lblPayload.TextAlign = ContentAlignment.MiddleCenter;
-            lblPayload.BackColor = Color.Yellow;
+            lblPayload.BackColor = Color.YellowGreen;
 
             lblNextTruck.Location = new Point(0, hourHeight + nrAutoHeight + payloadHeight);
             lblNextTruck.Size = new Size(availableArea.Width, nextTrucksHeight);
@@ -165,9 +201,15 @@ namespace TruckEntryList
             {
                 AddToList(parent.EntryData[i]);
             }
-
-            lblNrAuto.Text = parent.EntryData[0].nrAuto;
-            lblPayload.Text = parent.EntryData[0].payload;
+            if (parent.EntryData.Count > 0)
+            {
+                lblNrAuto.Text = parent.EntryData[0].nrAuto;
+                lblPayload.Text = parent.EntryData[0].payload;
+            } else
+            {
+                lblNrAuto.Text = "";
+                lblPayload.Text = "";
+            }
             lblNextTruck.Text = "";
             for (int i = 1; i < parent.EntryData.Count && i < 4; i++)
             {
@@ -199,7 +241,7 @@ namespace TruckEntryList
 
         private void label1_Click(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
+            this.windowState = FormWindowState.Normal;
             WindowMaximize();
         }
 
@@ -211,6 +253,15 @@ namespace TruckEntryList
         private void label1_MouseLeave(object sender, EventArgs e)
         {
             label1.BackColor = Color.Red;
+        }
+
+        private void lstTruckOrder_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            foreach (ListViewItem lvi in lstTruckOrder.SelectedItems)
+            {
+                lvi.Selected = false;
+            }
+            lstTruckOrder.SelectedItems.Clear();
         }
     }
 }
