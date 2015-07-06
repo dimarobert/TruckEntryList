@@ -38,6 +38,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.cmdSave = new System.Windows.Forms.Button();
             this.lblValidation = new System.Windows.Forms.Label();
+            this.cmdBrowseFolder = new System.Windows.Forms.Button();
+            this.txtRaportFolder = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.numHour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numNrAuto)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numPayload)).BeginInit();
@@ -70,7 +72,7 @@
             this.numHour.Name = "numHour";
             this.numHour.Size = new System.Drawing.Size(49, 20);
             this.numHour.TabIndex = 1;
-            this.numHour.ValueChanged += new System.EventHandler(this.numHour_ValueChanged);
+            this.numHour.ValueChanged += new System.EventHandler(this.inputs_ValueChanged);
             // 
             // numNrAuto
             // 
@@ -89,7 +91,7 @@
             this.numNrAuto.Name = "numNrAuto";
             this.numNrAuto.Size = new System.Drawing.Size(49, 20);
             this.numNrAuto.TabIndex = 1;
-            this.numNrAuto.ValueChanged += new System.EventHandler(this.numHour_ValueChanged);
+            this.numNrAuto.ValueChanged += new System.EventHandler(this.inputs_ValueChanged);
             // 
             // numPayload
             // 
@@ -108,7 +110,7 @@
             this.numPayload.Name = "numPayload";
             this.numPayload.Size = new System.Drawing.Size(49, 20);
             this.numPayload.TabIndex = 1;
-            this.numPayload.ValueChanged += new System.EventHandler(this.numHour_ValueChanged);
+            this.numPayload.ValueChanged += new System.EventHandler(this.inputs_ValueChanged);
             // 
             // numNextTrucks
             // 
@@ -127,7 +129,7 @@
             this.numNextTrucks.Name = "numNextTrucks";
             this.numNextTrucks.Size = new System.Drawing.Size(49, 20);
             this.numNextTrucks.TabIndex = 1;
-            this.numNextTrucks.ValueChanged += new System.EventHandler(this.numHour_ValueChanged);
+            this.numNextTrucks.ValueChanged += new System.EventHandler(this.inputs_ValueChanged);
             // 
             // label2
             // 
@@ -158,7 +160,7 @@
             // 
             // cmdSave
             // 
-            this.cmdSave.Location = new System.Drawing.Point(91, 116);
+            this.cmdSave.Location = new System.Drawing.Point(91, 151);
             this.cmdSave.Name = "cmdSave";
             this.cmdSave.Size = new System.Drawing.Size(75, 23);
             this.cmdSave.TabIndex = 2;
@@ -169,16 +171,36 @@
             // lblValidation
             // 
             this.lblValidation.AutoSize = true;
-            this.lblValidation.Location = new System.Drawing.Point(48, 121);
+            this.lblValidation.Location = new System.Drawing.Point(60, 156);
             this.lblValidation.Name = "lblValidation";
             this.lblValidation.Size = new System.Drawing.Size(0, 13);
             this.lblValidation.TabIndex = 0;
+            // 
+            // cmdBrowseFolder
+            // 
+            this.cmdBrowseFolder.Location = new System.Drawing.Point(140, 116);
+            this.cmdBrowseFolder.Name = "cmdBrowseFolder";
+            this.cmdBrowseFolder.Size = new System.Drawing.Size(24, 23);
+            this.cmdBrowseFolder.TabIndex = 4;
+            this.cmdBrowseFolder.Text = "...";
+            this.cmdBrowseFolder.UseVisualStyleBackColor = true;
+            this.cmdBrowseFolder.Click += new System.EventHandler(this.cmdBrowseFolder_Click);
+            // 
+            // txtRaportFolder
+            // 
+            this.txtRaportFolder.Location = new System.Drawing.Point(12, 118);
+            this.txtRaportFolder.Name = "txtRaportFolder";
+            this.txtRaportFolder.Size = new System.Drawing.Size(122, 20);
+            this.txtRaportFolder.TabIndex = 3;
+            this.txtRaportFolder.TextChanged += new System.EventHandler(this.inputs_ValueChanged);
             // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(173, 147);
+            this.ClientSize = new System.Drawing.Size(173, 186);
+            this.Controls.Add(this.cmdBrowseFolder);
+            this.Controls.Add(this.txtRaportFolder);
             this.Controls.Add(this.cmdSave);
             this.Controls.Add(this.numNextTrucks);
             this.Controls.Add(this.numPayload);
@@ -215,5 +237,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button cmdSave;
         private System.Windows.Forms.Label lblValidation;
+        private System.Windows.Forms.Button cmdBrowseFolder;
+        private System.Windows.Forms.TextBox txtRaportFolder;
     }
 }

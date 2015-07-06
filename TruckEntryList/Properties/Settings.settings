@@ -17,5 +17,8 @@
     <Setting Name="settingsFilePath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">./settings.dat</Value>
     </Setting>
+    <Setting Name="raportFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">./Rapoarte</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

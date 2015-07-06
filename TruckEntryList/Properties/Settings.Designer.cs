@@ -67,5 +67,14 @@ namespace TruckEntryList.Properties {
                 return ((string)(this["settingsFilePath"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("./Rapoarte")]
+        public string raportFolder {
+            get {
+                return ((string)(this["raportFolder"]));
+            }
+        }
     }
 }

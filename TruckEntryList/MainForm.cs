@@ -60,7 +60,7 @@ namespace TruckEntryList
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            CreateRaport();
+            
             lstTruckOrder.Items.Clear();
 
             presenter = new Presenter(this);
@@ -76,22 +76,34 @@ namespace TruckEntryList
             regUpdater.Start();
 
             Timer raportTimer = new Timer();
-            raportTimer.Interval = (int)(new TimeSpan(24, 0, 0) - new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second)).TotalMilliseconds;
+            DateTime tick = DateTime.Parse(DateTime.Now.ToString("00:00:00 dd.MM.yyyy"));
+            tick = tick.AddDays(1);
+            raportTimer.Interval = (int)(tick - DateTime.Now).TotalMilliseconds;
             raportTimer.Tick += RaportTimer_Tick;
             raportTimer.Start();
         }
 
         private void RaportTimer_Tick(object sender, EventArgs e)
         {
-            ((Timer)sender).Interval = (int)new TimeSpan(24, 0, 0).TotalMilliseconds;
+            DateTime tick = DateTime.Parse(DateTime.Now.ToString("00:00:00 dd.MM.yyyy"));
+            tick.AddDays(1);
+            ((Timer)sender).Interval = (int)(tick - DateTime.Now).TotalMilliseconds;
 
             CreateRaport();
         }
 
         private void CreateRaport()
         {
-            string dataRaport = DateTime.Now.Hour == 0 ? (DateTime.Now.Day - 1).ToString("00") + "" : DateTime.Now.Day.ToString("00") + "";
-            dataRaport += "." + DateTime.Now.Month.ToString("00") + "." + DateTime.Now.Year;
+
+            string dataRaport;
+            if (DateTime.Now.Hour >= 23)
+            {
+                dataRaport = DateTime.Now.Day.ToString("00") + "." + DateTime.Now.Month.ToString("00") + "." + DateTime.Now.Year;
+            }
+            else
+            {
+                dataRaport = (DateTime.Now.Day - 1).ToString("00") + "." + DateTime.Now.Month.ToString("00") + "." + DateTime.Now.Year;
+            }
 
             string fileName = Path.GetFullPath(@".\Rapoarte\Raport " + dataRaport + ".xlsx");
             FileInfo file = new FileInfo(fileName);
@@ -102,6 +114,7 @@ namespace TruckEntryList
             try
             {
                 excelApp = new Microsoft.Office.Interop.Excel.Application();
+                excelApp.DisplayAlerts = false;
                 excelApp.Visible = false;
                 excelApp.UserControl = false;
                 excelWb = excelApp.Workbooks.Add("");
@@ -133,11 +146,12 @@ namespace TruckEntryList
                 string[] lines = File.ReadAllLines(completedFile);
                 TruckInfo ti;
                 int i = 1;
-                foreach(string line in lines)
+                foreach (string line in lines)
                 {
                     if (TruckInfo.TryParse(line, out ti))
                     {
-                        if (!(ti.dateRegistered.Day == DateTime.Now.Day || ti.dateRegistered.Day == DateTime.Now.Day - 1))
+
+                        if (ti.dateRegistered.ToString("dd.MM.yyyy") != dataRaport)
                             continue;
 
                         excelWs.Cells[3 + i, 1] = i;
@@ -149,9 +163,24 @@ namespace TruckEntryList
                     }
                 }
 
-                excelWs.Range[excelWs.Cells[1, 1], excelWs.Cells[1, 5]].EntireColumn.AutoFit();
+                if (i != 1)
+                    AddBorder(excelWs.get_Range("A4", "E" + (i + 2)), XlBorderWeight.xlThin, true, true);
+
+                Range r = excelWs.Range[excelWs.Cells[1, 1], excelWs.Cells[1, 5]];
+                r.EntireColumn.AutoFit();
+                r.HorizontalAlignment = XlHAlign.xlHAlignCenter;
+                foreach (Range rr in r.Columns)
+                {
+                    rr.ColumnWidth = rr.ColumnWidth + 2;
+                }
+
+                r = excelWs.get_Range("A3", "E" + (i + 2));
+                r.HorizontalAlignment = XlHAlign.xlHAlignCenter;
+
+                
+
                 excelWb.SaveAs(fileName, XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing,
-                                false, false, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                                false, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
 
                 excelWb.Close();
                 excelApp.Quit();
@@ -159,18 +188,43 @@ namespace TruckEntryList
             }
             catch (Exception ex)
             {
+                MessageBox.Show("Salvarea raportului a esuat!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 if (excelWb != null)
-                    excelWb.Close();
+                    excelWb.Close(false, Type.Missing, Type.Missing);
                 if (excelApp != null)
                     excelApp.Quit();
             }
         }
 
-        private void AddBorder(Range cell, XlBorderWeight weight)
+        private void AddBorder(Range cell, XlBorderWeight weight, bool allBorders = false, bool notTop = false)
         {
+
             Borders border = cell.Borders;
-            border.LineStyle = XlLineStyle.xlContinuous;
-            border.Weight = weight;
+            if (!allBorders)
+            {
+                border.LineStyle = XlLineStyle.xlContinuous;
+                border.Weight = weight;
+            }
+            else
+            {
+                if (!notTop)
+                {
+                    border[XlBordersIndex.xlEdgeTop].LineStyle = XlLineStyle.xlContinuous;
+                    border[XlBordersIndex.xlEdgeTop].Weight = weight;
+                }
+                border[XlBordersIndex.xlEdgeLeft].LineStyle = XlLineStyle.xlContinuous;
+                border[XlBordersIndex.xlEdgeLeft].Weight = weight;
+                border[XlBordersIndex.xlEdgeRight].LineStyle = XlLineStyle.xlContinuous;
+                border[XlBordersIndex.xlEdgeRight].Weight = weight;
+                border[XlBordersIndex.xlEdgeBottom].LineStyle = XlLineStyle.xlContinuous;
+                border[XlBordersIndex.xlEdgeBottom].Weight = weight;
+
+                border[XlBordersIndex.xlInsideHorizontal].LineStyle = XlLineStyle.xlContinuous;
+                border[XlBordersIndex.xlInsideHorizontal].Weight = weight;
+                border[XlBordersIndex.xlInsideVertical].LineStyle = XlLineStyle.xlContinuous;
+                border[XlBordersIndex.xlInsideVertical].Weight = weight;
+
+            }
         }
 
         private void RegUpdater_Tick(object sender, EventArgs e)

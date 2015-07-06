@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -20,6 +21,7 @@ namespace TruckEntryList
             numNrAuto.Value = (decimal)PresenterSettings.nrAutoZone;
             numPayload.Value = (decimal)PresenterSettings.payloadZone;
             numNextTrucks.Value = (decimal)PresenterSettings.nextTrucksZone;
+            txtRaportFolder.Text = PresenterSettings.raportFolder;
             ValidateData();
         }
 
@@ -29,17 +31,26 @@ namespace TruckEntryList
             PresenterSettings.nrAutoZone = (float)numNrAuto.Value;
             PresenterSettings.payloadZone = (float)numPayload.Value;
             PresenterSettings.nextTrucksZone = (float)numNextTrucks.Value;
+            PresenterSettings.raportFolder = txtRaportFolder.Text;
             this.Close();
         }
 
-        private void numHour_ValueChanged(object sender, EventArgs e)
+        private void inputs_ValueChanged(object sender, EventArgs e)
         {
             ValidateData();
         }
 
         private void ValidateData()
         {
-            if (numHour.Value + numNrAuto.Value + numPayload.Value + numNextTrucks.Value == 1)
+            bool rExists = false;
+            try
+            {
+                DirectoryInfo di = new DirectoryInfo(Path.GetFullPath(txtRaportFolder.Text));
+                rExists = di.Exists;
+            }
+            catch (Exception ex) { }
+
+            if (numHour.Value + numNrAuto.Value + numPayload.Value + numNextTrucks.Value == 1 && rExists)
             {
                 lblValidation.ForeColor = Color.Green;
                 lblValidation.Text = "OK";
@@ -53,6 +64,14 @@ namespace TruckEntryList
                 lblValidation.Location = new Point(cmdSave.Location.X - lblValidation.Size.Width, lblValidation.Location.Y);
                 cmdSave.Enabled = false;
             }
+        }
+
+        private void cmdBrowseFolder_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.SelectedPath = Path.GetFullPath("./");
+            if (fbd.ShowDialog() == DialogResult.OK)
+                txtRaportFolder.Text = fbd.SelectedPath;
         }
     }
 }
