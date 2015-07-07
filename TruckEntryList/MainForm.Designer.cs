@@ -35,7 +35,6 @@
             "Rapita",
             "24:99:99 99.99.9999"}, -1);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.cmdAdd = new System.Windows.Forms.Button();
             this.txtNrAuto = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.lblNrCrt = new System.Windows.Forms.Label();
@@ -54,19 +53,10 @@
             this.cmdRemTruck = new System.Windows.Forms.ToolStripMenuItem();
             this.cmdShowPresenter = new System.Windows.Forms.Button();
             this.cmdSettings = new System.Windows.Forms.Button();
+            this.cmdRaport = new System.Windows.Forms.Button();
+            this.cmdAdd = new System.Windows.Forms.Button();
             this.mnuTruckList.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // cmdAdd
-            // 
-            this.cmdAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.cmdAdd.Location = new System.Drawing.Point(147, 132);
-            this.cmdAdd.Name = "cmdAdd";
-            this.cmdAdd.Size = new System.Drawing.Size(75, 26);
-            this.cmdAdd.TabIndex = 4;
-            this.cmdAdd.Text = "Adauga";
-            this.cmdAdd.UseVisualStyleBackColor = true;
-            this.cmdAdd.Click += new System.EventHandler(this.cmdAdd_Click);
             // 
             // txtNrAuto
             // 
@@ -142,11 +132,11 @@
             // 
             this.cmdNext.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.cmdNext.ForeColor = System.Drawing.Color.Blue;
-            this.cmdNext.Location = new System.Drawing.Point(147, 164);
+            this.cmdNext.Image = global::TruckEntryList.Properties.Resources.next;
+            this.cmdNext.Location = new System.Drawing.Point(187, 132);
             this.cmdNext.Name = "cmdNext";
-            this.cmdNext.Size = new System.Drawing.Size(75, 26);
+            this.cmdNext.Size = new System.Drawing.Size(35, 35);
             this.cmdNext.TabIndex = 5;
-            this.cmdNext.Text = "Urmatorul";
             this.cmdNext.UseVisualStyleBackColor = true;
             this.cmdNext.Click += new System.EventHandler(this.cmdNext_Click);
             // 
@@ -220,30 +210,52 @@
             // 
             this.cmdShowPresenter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.cmdShowPresenter.ForeColor = System.Drawing.Color.Green;
-            this.cmdShowPresenter.Location = new System.Drawing.Point(12, 132);
+            this.cmdShowPresenter.Image = global::TruckEntryList.Properties.Resources.presenter;
+            this.cmdShowPresenter.Location = new System.Drawing.Point(100, 132);
             this.cmdShowPresenter.Name = "cmdShowPresenter";
-            this.cmdShowPresenter.Size = new System.Drawing.Size(129, 26);
+            this.cmdShowPresenter.Size = new System.Drawing.Size(40, 40);
             this.cmdShowPresenter.TabIndex = 5;
-            this.cmdShowPresenter.Text = "Arata Afisajul";
             this.cmdShowPresenter.UseVisualStyleBackColor = true;
             this.cmdShowPresenter.Click += new System.EventHandler(this.cmdShowPresenter_Click);
             // 
             // cmdSettings
             // 
             this.cmdSettings.ForeColor = System.Drawing.Color.Red;
-            this.cmdSettings.Location = new System.Drawing.Point(12, 167);
+            this.cmdSettings.Image = global::TruckEntryList.Properties.Resources.settings;
+            this.cmdSettings.Location = new System.Drawing.Point(15, 156);
             this.cmdSettings.Name = "cmdSettings";
-            this.cmdSettings.Size = new System.Drawing.Size(51, 23);
+            this.cmdSettings.Size = new System.Drawing.Size(30, 30);
             this.cmdSettings.TabIndex = 101;
-            this.cmdSettings.Text = "Setari";
             this.cmdSettings.UseVisualStyleBackColor = true;
             this.cmdSettings.Click += new System.EventHandler(this.cmdSettings_Click);
+            // 
+            // cmdRaport
+            // 
+            this.cmdRaport.Image = global::TruckEntryList.Properties.Resources.raport;
+            this.cmdRaport.Location = new System.Drawing.Point(51, 156);
+            this.cmdRaport.Name = "cmdRaport";
+            this.cmdRaport.Size = new System.Drawing.Size(30, 30);
+            this.cmdRaport.TabIndex = 102;
+            this.cmdRaport.UseVisualStyleBackColor = true;
+            this.cmdRaport.Click += new System.EventHandler(this.cmdRaport_Click);
+            // 
+            // cmdAdd
+            // 
+            this.cmdAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.cmdAdd.Image = global::TruckEntryList.Properties.Resources.add;
+            this.cmdAdd.Location = new System.Drawing.Point(146, 132);
+            this.cmdAdd.Name = "cmdAdd";
+            this.cmdAdd.Size = new System.Drawing.Size(35, 35);
+            this.cmdAdd.TabIndex = 4;
+            this.cmdAdd.UseVisualStyleBackColor = true;
+            this.cmdAdd.Click += new System.EventHandler(this.cmdAdd_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(559, 202);
+            this.ClientSize = new System.Drawing.Size(559, 198);
+            this.Controls.Add(this.cmdRaport);
             this.Controls.Add(this.cmdSettings);
             this.Controls.Add(this.txtPayload);
             this.Controls.Add(this.lstTruckOrder);
@@ -262,6 +274,7 @@
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "Truck Entry List";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.mnuTruckList.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -290,6 +303,7 @@
         private System.Windows.Forms.ToolStripMenuItem cmdRemTruck;
         private System.Windows.Forms.Button cmdShowPresenter;
         private System.Windows.Forms.Button cmdSettings;
+        private System.Windows.Forms.Button cmdRaport;
     }
 }
 

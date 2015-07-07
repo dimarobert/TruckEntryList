@@ -60,7 +60,7 @@ namespace TruckEntryList
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            
+
             lstTruckOrder.Items.Clear();
 
             presenter = new Presenter(this);
@@ -89,25 +89,29 @@ namespace TruckEntryList
             tick.AddDays(1);
             ((Timer)sender).Interval = (int)(tick - DateTime.Now).TotalMilliseconds;
 
-            CreateRaport();
+            string file = Path.GetFullPath(PresenterSettings.raportFolder);
+            if (!file.EndsWith(Path.DirectorySeparatorChar.ToString())) file += Path.DirectorySeparatorChar.ToString();
+            file += "Raport " + DateTime.Now.AddDays(-1).ToString("yyyy.MM.dd") + ".xlsx";
+
+            CreateRaport(DateTime.Now.AddDays(-1), file);
         }
 
-        private void CreateRaport()
+        private void CreateRaport(DateTime rDate, string file)
         {
 
-            string dataRaport;
-            if (DateTime.Now.Hour >= 23)
+            string dataRaport = rDate.ToString("dd.MM.yyyy");
+            /*if (DateTime.Now.Hour >= 23)
             {
                 dataRaport = DateTime.Now.Day.ToString("00") + "." + DateTime.Now.Month.ToString("00") + "." + DateTime.Now.Year;
             }
             else
             {
                 dataRaport = (DateTime.Now.Day - 1).ToString("00") + "." + DateTime.Now.Month.ToString("00") + "." + DateTime.Now.Year;
-            }
+            }*/
 
-            string fileName = Path.GetFullPath(@".\Rapoarte\Raport " + dataRaport + ".xlsx");
-            FileInfo file = new FileInfo(fileName);
-            file.Directory.Create();
+            //string file = file;
+            FileInfo fileInfo = new FileInfo(file);
+            fileInfo.Directory.Create();
 
             Microsoft.Office.Interop.Excel.Application excelApp = null;
             _Workbook excelWb = null;
@@ -144,6 +148,7 @@ namespace TruckEntryList
 
 
                 string[] lines = File.ReadAllLines(completedFile);
+                
                 TruckInfo ti;
                 int i = 1;
                 foreach (string line in lines)
@@ -165,6 +170,14 @@ namespace TruckEntryList
 
                 if (i != 1)
                     AddBorder(excelWs.get_Range("A4", "E" + (i + 2)), XlBorderWeight.xlThin, true, true);
+                else
+                {
+                    // Nu avem nimic de raportat. ABORT
+                    MessageBox.Show("Raportul pe data " + dataRaport + " este gol. Raportul nu a fost salvat.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    excelWb.Close(false, Type.Missing, Type.Missing);
+                    excelApp.Quit();
+                    return;
+                }
 
                 Range r = excelWs.Range[excelWs.Cells[1, 1], excelWs.Cells[1, 5]];
                 r.EntireColumn.AutoFit();
@@ -177,18 +190,18 @@ namespace TruckEntryList
                 r = excelWs.get_Range("A3", "E" + (i + 2));
                 r.HorizontalAlignment = XlHAlign.xlHAlignCenter;
 
-                
 
-                excelWb.SaveAs(fileName, XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing,
+
+                excelWb.SaveAs(file, XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing,
                                 false, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
 
-                excelWb.Close();
+                excelWb.Close(false, Type.Missing, Type.Missing);
                 excelApp.Quit();
 
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Salvarea raportului a esuat!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("Salvarea raportului a esuat!\nMessage: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 if (excelWb != null)
                     excelWb.Close(false, Type.Missing, Type.Missing);
                 if (excelApp != null)
@@ -280,6 +293,8 @@ namespace TruckEntryList
 
         private void AddEntryToCompleted(TruckInfo entry)
         {
+            int pos = File.ReadAllLines(completedFile).Length + 1;
+            entry.nrCrt = pos;
             using (StreamWriter sw = new StreamWriter(completedFile, true))
             {
                 sw.WriteLine(entry.ToString() + "|" + DateTime.Now);
@@ -465,6 +480,36 @@ namespace TruckEntryList
 
             if (presenter != null)
                 presenter.UpdatePresenterSettings();
+        }
+
+        private void cmdRaport_Click(object sender, EventArgs e)
+        {
+            RaportSelect rs = new RaportSelect();
+            if (rs.ShowDialog() == DialogResult.OK)
+            {
+                string file = Path.GetFullPath(PresenterSettings.raportFolder);
+                if (!file.EndsWith(Path.DirectorySeparatorChar.ToString())) file += Path.DirectorySeparatorChar.ToString();
+                file += "Raport " + rs.raportDate.Value.ToString("yyyy.MM.dd") + ".xlsx";
+                if (File.Exists(file))
+                {
+                    OpenFileDialog ofd = new OpenFileDialog();
+                    ofd.InitialDirectory = file.Substring(0, file.IndexOf(Path.GetFileName(file)));
+                    ofd.Multiselect = false;
+                    ofd.FileName = file.Substring(file.IndexOf(Path.GetFileName(file)));
+                    ofd.Filter = "Microsoft Excel 2010 File|*.xlsx";
+                    if (ofd.ShowDialog() == DialogResult.OK)
+                        file = ofd.FileName;
+                }
+                CreateRaport(rs.raportDate.Value, file);
+            }
+            rs.Dispose();
+            // TODO: Check last raport made and go from there.
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (MessageBox.Show("Sunteti sigur ca vreti sa parasiti aplicatia?", "Confirmare", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                e.Cancel = true;
         }
     }
 }
