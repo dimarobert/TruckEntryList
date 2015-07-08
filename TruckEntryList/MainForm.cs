@@ -293,6 +293,8 @@ namespace TruckEntryList
 
         private void AddEntryToCompleted(TruckInfo entry)
         {
+            if (!File.Exists(completedFile))
+                File.Create(completedFile).Close();
             int pos = File.ReadAllLines(completedFile).Length + 1;
             entry.nrCrt = pos;
             using (StreamWriter sw = new StreamWriter(completedFile, true))
