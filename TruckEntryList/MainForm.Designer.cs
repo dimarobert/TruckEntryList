@@ -133,9 +133,9 @@
             this.cmdNext.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.cmdNext.ForeColor = System.Drawing.Color.Blue;
             this.cmdNext.Image = global::TruckEntryList.Properties.Resources.next;
-            this.cmdNext.Location = new System.Drawing.Point(187, 132);
+            this.cmdNext.Location = new System.Drawing.Point(172, 173);
             this.cmdNext.Name = "cmdNext";
-            this.cmdNext.Size = new System.Drawing.Size(35, 35);
+            this.cmdNext.Size = new System.Drawing.Size(50, 50);
             this.cmdNext.TabIndex = 5;
             this.cmdNext.UseVisualStyleBackColor = true;
             this.cmdNext.Click += new System.EventHandler(this.cmdNext_Click);
@@ -153,7 +153,7 @@
             this.lstTruckOrder.Location = new System.Drawing.Point(228, 12);
             this.lstTruckOrder.MultiSelect = false;
             this.lstTruckOrder.Name = "lstTruckOrder";
-            this.lstTruckOrder.Size = new System.Drawing.Size(319, 178);
+            this.lstTruckOrder.Size = new System.Drawing.Size(319, 210);
             this.lstTruckOrder.TabIndex = 6;
             this.lstTruckOrder.UseCompatibleStateImageBehavior = false;
             this.lstTruckOrder.View = System.Windows.Forms.View.Details;
@@ -211,7 +211,7 @@
             this.cmdShowPresenter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.cmdShowPresenter.ForeColor = System.Drawing.Color.Green;
             this.cmdShowPresenter.Image = global::TruckEntryList.Properties.Resources.presenter;
-            this.cmdShowPresenter.Location = new System.Drawing.Point(100, 132);
+            this.cmdShowPresenter.Location = new System.Drawing.Point(87, 182);
             this.cmdShowPresenter.Name = "cmdShowPresenter";
             this.cmdShowPresenter.Size = new System.Drawing.Size(40, 40);
             this.cmdShowPresenter.TabIndex = 5;
@@ -222,7 +222,7 @@
             // 
             this.cmdSettings.ForeColor = System.Drawing.Color.Red;
             this.cmdSettings.Image = global::TruckEntryList.Properties.Resources.settings;
-            this.cmdSettings.Location = new System.Drawing.Point(15, 156);
+            this.cmdSettings.Location = new System.Drawing.Point(15, 192);
             this.cmdSettings.Name = "cmdSettings";
             this.cmdSettings.Size = new System.Drawing.Size(30, 30);
             this.cmdSettings.TabIndex = 101;
@@ -232,7 +232,7 @@
             // cmdRaport
             // 
             this.cmdRaport.Image = global::TruckEntryList.Properties.Resources.raport;
-            this.cmdRaport.Location = new System.Drawing.Point(51, 156);
+            this.cmdRaport.Location = new System.Drawing.Point(51, 192);
             this.cmdRaport.Name = "cmdRaport";
             this.cmdRaport.Size = new System.Drawing.Size(30, 30);
             this.cmdRaport.TabIndex = 102;
@@ -243,7 +243,7 @@
             // 
             this.cmdAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.cmdAdd.Image = global::TruckEntryList.Properties.Resources.add;
-            this.cmdAdd.Location = new System.Drawing.Point(146, 132);
+            this.cmdAdd.Location = new System.Drawing.Point(187, 132);
             this.cmdAdd.Name = "cmdAdd";
             this.cmdAdd.Size = new System.Drawing.Size(35, 35);
             this.cmdAdd.TabIndex = 4;
@@ -254,7 +254,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(559, 198);
+            this.ClientSize = new System.Drawing.Size(559, 234);
             this.Controls.Add(this.cmdRaport);
             this.Controls.Add(this.cmdSettings);
             this.Controls.Add(this.txtPayload);

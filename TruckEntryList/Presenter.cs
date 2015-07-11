@@ -22,7 +22,7 @@ namespace TruckEntryList
             InitializeComponent();
 
             label1.Visible = false;
-            lblHour.Text = DateTime.Now.ToString("dd.MM.yyyy\nHH:MM:ss");
+            lblHour.Text = DateTime.Now.ToString("dd.MM.yyyy\nHH:mm:ss");
             lstTruckOrder.Items.Clear();
             lblNrAuto.Text = "";
             lblPayload.Text = "";
@@ -52,7 +52,7 @@ namespace TruckEntryList
 
         private void HourTimer_Tick(object sender, EventArgs e)
         {
-            lblHour.Text = DateTime.Now.ToString("dd.MM.yyyy\nHH:MM:ss");
+            lblHour.Text = DateTime.Now.ToString("dd.MM.yyyy\nHH:mm:ss");
         }
 
         private void Parent_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -232,7 +232,7 @@ namespace TruckEntryList
             lvi.SubItems.Add(lvsi);
 
             lvsi = new ListViewItem.ListViewSubItem();
-            lvsi.Text = entry.dateRegistered.ToString("HH:MM  dd.MM.yyyy");
+            lvsi.Text = entry.dateRegistered.ToString("HH:mm  dd.MM.yyyy");
             lvi.SubItems.Add(lvsi);
 
 

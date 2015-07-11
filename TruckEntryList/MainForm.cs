@@ -16,6 +16,8 @@ namespace TruckEntryList
         private StreamWriter logFile;
         private const string completedFile = "./completedFile.dat";
 
+        // TODO: Saving animation
+
         private Presenter presenter;
 
         private List<TruckInfo> entryData;
@@ -54,19 +56,6 @@ namespace TruckEntryList
 
             AutoIncrementNrCrt = 1;
 
-
-            TruckInfo ti = new TruckInfo();
-            ti.nrCrt = 10;
-            ti.nrAuto = "A-01-ACA";
-            ti.payload = "ss";
-            ti.dateRegistered = DateTime.Now.AddHours(-5);
-            ti.dateEntry = DateTime.Now;
-
-            Stream fs = File.Open("./serializationTest.dat", FileMode.Create);
-            ti.WriteObject(fs);
-            fs.Seek(0, SeekOrigin.Begin);
-            TruckInfo ti2 = new TruckInfo(fs);
-            fs.Close();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -109,18 +98,14 @@ namespace TruckEntryList
 
         private void CreateRaport(DateTime rDate, string file)
         {
+            if (!File.Exists(completedFile))
+            {
+                MessageBox.Show("Fisierul in care se stocheaza istoricul intrarilor nu a fost gasit.\nDaca este prima folosire a aplicatiei si nu s-a folosit niciodata functia Urmatorul, totul este in regula.\nIn caz contrar anuntati administratorul.", "Nu s-a putut crea raportul", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
 
             string dataRaport = rDate.ToString("dd.MM.yyyy");
-            /*if (DateTime.Now.Hour >= 23)
-            {
-                dataRaport = DateTime.Now.Day.ToString("00") + "." + DateTime.Now.Month.ToString("00") + "." + DateTime.Now.Year;
-            }
-            else
-            {
-                dataRaport = (DateTime.Now.Day - 1).ToString("00") + "." + DateTime.Now.Month.ToString("00") + "." + DateTime.Now.Year;
-            }*/
 
-            //string file = file;
             FileInfo fileInfo = new FileInfo(file);
             fileInfo.Directory.Create();
 
@@ -138,9 +123,7 @@ namespace TruckEntryList
                 excelWs.Range[excelWs.Cells[1, 1], excelWs.Cells[1, 5]].Merge();
 
 
-
                 excelWs.Cells[1, 1] = "Raport pentru ziua: " + dataRaport;
-
 
                 excelWs.Cells[3, 1] = "Nr. Crt.";
                 AddBorder(excelWs.Cells[3, 1], XlBorderWeight.xlThick);
@@ -157,25 +140,30 @@ namespace TruckEntryList
                 excelWs.Cells[3, 5] = "Data Intrare";
                 AddBorder(excelWs.Cells[3, 5], XlBorderWeight.xlThick);
 
-
-                string[] lines = File.ReadAllLines(completedFile);
-
-                TruckInfo ti;
                 int i = 1;
-                foreach (string line in lines)
+                using (Stream stream = File.Open(completedFile, FileMode.Open, FileAccess.Read))
                 {
-                    if (TruckInfo.TryParse(line, out ti))
+                    int count;
+                    byte[] buffer = new byte[4];
+                    stream.Read(buffer, 0, 4);
+                    count = BitConverter.ToInt32(buffer, 0);
+
+                    while (stream.Position < stream.Length)
                     {
+                        TruckInfo ti;
+                        if (TruckInfo.TryParse(stream, out ti))
+                        {
 
-                        if (ti.dateRegistered.ToString("dd.MM.yyyy") != dataRaport)
-                            continue;
+                            if (ti.dateRegistered.ToString("dd.MM.yyyy") != dataRaport)
+                                continue;
 
-                        excelWs.Cells[3 + i, 1] = i;
-                        excelWs.Cells[3 + i, 2] = ti.nrAuto;
-                        excelWs.Cells[3 + i, 3] = ti.payload;
-                        excelWs.Cells[3 + i, 4] = ti.dateRegistered;
-                        excelWs.Cells[3 + i, 5] = ti.dateEntry;
-                        i++;
+                            excelWs.Cells[3 + i, 1] = i;
+                            excelWs.Cells[3 + i, 2] = ti.nrAuto;
+                            excelWs.Cells[3 + i, 3] = ti.payload;
+                            excelWs.Cells[3 + i, 4] = ti.dateRegistered;
+                            excelWs.Cells[3 + i, 5] = ti.dateEntry;
+                            i++;
+                        }
                     }
                 }
 
@@ -259,35 +247,22 @@ namespace TruckEntryList
         private void LoadData()
         {
             EntryData.Clear();
-            string line;
-            int lineCnt = 0;
-            bool errorOnReading = false;
+
             if (!File.Exists(dataFile))
                 return;
-            using (StreamReader sr = new StreamReader(dataFile))
+
+            using (Stream stream = File.Open(dataFile, FileMode.Open))
             {
-                while (sr.Peek() > -1)
+                while (stream.Position < stream.Length)
                 {
-                    line = sr.ReadLine();
-                    lineCnt++;
-                    TruckInfo ti;
-                    if (TruckInfo.TryParse(line, out ti))
-                    {
-                        EntryData.Add(ti);
-                        AddToList(ti);
-                        AutoIncrementNrCrt = ti.nrCrt + 1;
-                    }
-                    else
-                    {
-                        PrintError(lineCnt);
-                        errorOnReading = true;
-                    }
+                    TruckInfo ti = new TruckInfo(stream);
+                    EntryData.Add(ti);
+                    AddToList(ti);
+                    AutoIncrementNrCrt = ti.nrCrt + 1;
+
                 }
             }
-            if (errorOnReading)
-            {
-                MessageBox.Show("Au aparut erori in citirea datelor.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
+
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("EntryData"));
@@ -298,19 +273,36 @@ namespace TruckEntryList
         {
             using (StreamWriter sw = new StreamWriter(dataFile, true))
             {
-                sw.WriteLine(entry.ToString());
+                entry.WriteObject(sw.BaseStream);
+                //sw.WriteLine(entry.ToString());
             }
         }
 
         private void AddEntryToCompleted(TruckInfo entry)
         {
             if (!File.Exists(completedFile))
-                File.Create(completedFile).Close();
-            int pos = File.ReadAllLines(completedFile).Length + 1;
-            entry.nrCrt = pos;
-            using (StreamWriter sw = new StreamWriter(completedFile, true))
             {
-                sw.WriteLine(entry.ToString() + "|" + DateTime.Now);
+                Stream s = File.Create(completedFile);
+                s.Write(BitConverter.GetBytes(0), 0, 4);
+                s.Close();
+            }
+
+            using (Stream stream = File.Open(completedFile, FileMode.Open, FileAccess.ReadWrite))
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                byte[] posByte = new byte[4];
+                if (stream.Length != 0)
+                {
+                    stream.Read(posByte, 0, 4);
+                }
+                else posByte = BitConverter.GetBytes(0);
+                int pos = BitConverter.ToInt32(posByte, 0);
+                entry.nrCrt = ++pos;
+                stream.Seek(0, SeekOrigin.Begin);
+                stream.Write(BitConverter.GetBytes(pos), 0, 4);
+                stream.Seek(0, SeekOrigin.End);
+                entry.WriteObject(stream);
+
             }
         }
 
@@ -328,7 +320,7 @@ namespace TruckEntryList
             lvi.SubItems.Add(lvsi);
 
             lvsi = new ListViewItem.ListViewSubItem();
-            lvsi.Text = entry.dateRegistered.ToString("HH:MM:ss dd.MM.yyyy");
+            lvsi.Text = entry.dateRegistered.ToString("HH:mm:ss dd.MM.yyyy");
             lvi.SubItems.Add(lvsi);
 
 
@@ -393,34 +385,44 @@ namespace TruckEntryList
         {
             if (lstTruckOrder.SelectedItems.Count == 1)
             {
-                string[] lines = File.ReadAllLines(dataFile);
-                using (StreamWriter sw = new StreamWriter(dataFile, false))
+                using (Stream stream = File.Open(dataFile, FileMode.Open, FileAccess.ReadWrite))
                 {
-                    bool lineFound = false;
-                    foreach (string line in lines)
+
+                    int position, length, nrcrt;
+                    checked
                     {
-                        if (lineFound)
-                        {
-                            TruckInfo ti;
-                            TruckInfo.TryParse(line, out ti);
-                            ti.nrCrt--;
-
-                            EntryData[ti.nrCrt].nrCrt--;
-                            lstTruckOrder.Items[ti.nrCrt].SubItems[0].Text = ti.nrCrt.ToString();
-
-                            sw.WriteLine(ti.ToString());
-                        }
-                        else
-                        {
-                            if (!line.StartsWith(lstTruckOrder.SelectedItems[0].Text + "|"))
-                                sw.WriteLine(line);
-                            else lineFound = true;
-                        }
+                        position = lstTruckOrder.SelectedIndices[0] + 1;
+                        position *= TruckInfo.sizeInBytes;
                     }
+                    stream.Seek(position, SeekOrigin.Begin);
+                    byte[] buffer = new byte[4096];
+                    while ((length = stream.Read(buffer, 0, 4096)) > 0)
+                    {
+                        stream.Seek(-(length + TruckInfo.sizeInBytes), SeekOrigin.Current);
+                        stream.Write(buffer, 0, length);
+                        stream.Seek(TruckInfo.sizeInBytes, SeekOrigin.Current);
+                    }
+                    position -= TruckInfo.sizeInBytes;
+                    stream.Seek(position, SeekOrigin.Begin);
+                    stream.Read(buffer, 0, 4);
+                    stream.Seek(-4, SeekOrigin.Current);
+                    nrcrt = BitConverter.ToInt32(buffer, 0);
+                    nrcrt--;
+                    while (stream.Position < stream.Length - TruckInfo.sizeInBytes)
+                    {
+                        stream.Write(BitConverter.GetBytes(nrcrt), 0, 4);
+                        stream.Seek(TruckInfo.sizeInBytes - 4, SeekOrigin.Current);
+
+                        EntryData[nrcrt].nrCrt--;
+                        lstTruckOrder.Items[nrcrt].SubItems[0].Text = nrcrt.ToString();
+                        nrcrt++;
+                    }
+                    stream.SetLength(stream.Length - TruckInfo.sizeInBytes);
                 }
+
                 EntryData.RemoveAt(lstTruckOrder.SelectedIndices[0]);
                 lstTruckOrder.Items.Remove(lstTruckOrder.SelectedItems[0]);
-                AutoIncrementNrCrt = EntryData.Last().nrCrt + 1;
+                AutoIncrementNrCrt = EntryData.Count == 0 ? 1 : EntryData.Last().nrCrt + 1;
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("EntryData"));
@@ -435,31 +437,31 @@ namespace TruckEntryList
                 MessageBox.Show("Nu exista nici o masina in asteptare!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            EntryData[0].dateEntry = DateTime.Now;
             AddEntryToCompleted(EntryData[0]);
-            string[] lines = File.ReadAllLines(dataFile);
-            using (StreamWriter sw = new StreamWriter(dataFile, false))
+
+            using (Stream stream = File.Open(dataFile, FileMode.Open, FileAccess.ReadWrite))
             {
-                lines = lines.Skip(1).ToArray();
+                stream.Seek(TruckInfo.sizeInBytes, SeekOrigin.Begin);
 
-                foreach (string line in lines)
+                while (stream.Position < stream.Length)
                 {
-                    TruckInfo ti;
-                    TruckInfo.TryParse(line, out ti);
-
+                    TruckInfo ti = new TruckInfo(stream);
                     ti.nrCrt--;
                     EntryData[ti.nrCrt].nrCrt--;
                     lstTruckOrder.Items[ti.nrCrt].Text = ti.nrCrt.ToString();
 
-                    sw.WriteLine(ti.ToString());
+                    stream.Seek(-2 * TruckInfo.sizeInBytes, SeekOrigin.Current);
+                    ti.WriteObject(stream);
+                    stream.Seek(TruckInfo.sizeInBytes, SeekOrigin.Current);
                 }
+                stream.SetLength(stream.Length - TruckInfo.sizeInBytes);
             }
 
             EntryData.RemoveAt(0);
             lstTruckOrder.Items.RemoveAt(0);
-            if (EntryData.Count == 0)
-                AutoIncrementNrCrt = 1;
-            else
-                AutoIncrementNrCrt = EntryData.Last().nrCrt + 1;
+
+            AutoIncrementNrCrt = EntryData.Count == 0 ? 1 : EntryData.Last().nrCrt + 1;
 
             if (PropertyChanged != null)
             {

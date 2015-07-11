@@ -6,6 +6,7 @@ namespace TruckEntryList
 {
     public class TruckInfo
     {
+        public const int sizeInBytes = 122;
 
         public TruckInfo() { }
 
@@ -93,6 +94,19 @@ namespace TruckEntryList
                 return true;
             }
             return false;
+        }
+
+        public static bool TryParse(Stream s, out TruckInfo result)
+        {
+            result = new TruckInfo();
+            try
+            {
+                result.ReadObject(s);
+                return true;
+            } catch(Exception ex)
+            {
+                return false;
+            }
         }
 
         public void WriteObject(Stream stream)
