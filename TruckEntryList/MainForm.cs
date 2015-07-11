@@ -2,11 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace TruckEntryList
@@ -56,6 +53,20 @@ namespace TruckEntryList
             EntryData = new List<TruckInfo>();
 
             AutoIncrementNrCrt = 1;
+
+
+            TruckInfo ti = new TruckInfo();
+            ti.nrCrt = 10;
+            ti.nrAuto = "A-01-ACA";
+            ti.payload = "ss";
+            ti.dateRegistered = DateTime.Now.AddHours(-5);
+            ti.dateEntry = DateTime.Now;
+
+            Stream fs = File.Open("./serializationTest.dat", FileMode.Create);
+            ti.WriteObject(fs);
+            fs.Seek(0, SeekOrigin.Begin);
+            TruckInfo ti2 = new TruckInfo(fs);
+            fs.Close();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -148,7 +159,7 @@ namespace TruckEntryList
 
 
                 string[] lines = File.ReadAllLines(completedFile);
-                
+
                 TruckInfo ti;
                 int i = 1;
                 foreach (string line in lines)
