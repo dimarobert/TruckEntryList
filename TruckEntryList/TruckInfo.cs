@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -69,7 +70,7 @@ namespace TruckEntryList
                 ti.nrAuto = itemProps[1];
                 ti.payload = itemProps[2];
                 DateTime time;
-                if (DateTime.TryParse(itemProps[3], out time))
+                if (DateTime.TryParseExact(itemProps[3], "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out time))
                 {
                     ti.dateRegistered = time;
                 }
@@ -80,7 +81,7 @@ namespace TruckEntryList
 
                 if (itemProps.Length == 5)
                 {
-                    if (DateTime.TryParse(itemProps[4], out time))
+                    if (DateTime.TryParseExact(itemProps[4], "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out time))
                     {
                         ti.dateEntry = time;
                     }
@@ -153,13 +154,13 @@ namespace TruckEntryList
             Array.Clear(stringBuffer, 0, 60);
             stream.Read(stringBuffer, 0, 19);
             DateTime dt;
-            if (DateTime.TryParse(Encoding.ASCII.GetString(stringBuffer), out dt))
+            if (DateTime.TryParseExact(Encoding.ASCII.GetString(stringBuffer).Replace("\0", ""), "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out dt))
                 dateRegistered = dt;
             else throw new FormatException("Could not decode the Registration Date.");
 
             Array.Clear(stringBuffer, 0, 19);
             stream.Read(stringBuffer, 0, 19);
-            if (DateTime.TryParse(Encoding.ASCII.GetString(stringBuffer), out dt))
+            if (DateTime.TryParseExact(Encoding.ASCII.GetString(stringBuffer).Replace("\0", ""), "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out dt))
                 dateEntry = dt;
             else throw new FormatException("Could not decode the Entry Date.");
         }

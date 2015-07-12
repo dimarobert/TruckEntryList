@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -16,8 +17,15 @@ namespace TruckEntryList
         private StreamWriter logFile;
         private const string completedFile = "./completedFile.dat";
 
-        // TODO: Saving animation
+        private enum SavingStates
+        {
+            Saving,
+            SavingRed,
+            Saved,
+            SavedGreen
+        }
 
+        private SavingStates SavingState;
         private Presenter presenter;
 
         private List<TruckInfo> entryData;
@@ -66,6 +74,8 @@ namespace TruckEntryList
             presenter = new Presenter(this);
             presenter.Show();
 
+            LoadImages();
+
             LoadData();
 
             lblNrCrt.DataBindings.Add("Text", this, "AutoIncrementNrCrt");
@@ -76,11 +86,42 @@ namespace TruckEntryList
             regUpdater.Start();
 
             Timer raportTimer = new Timer();
-            DateTime tick = DateTime.Parse(DateTime.Now.ToString("00:00:00 dd.MM.yyyy"));
+            DateTime tick = DateTime.Now;
+            tick = tick.AddHours(-tick.Hour).AddMinutes(-tick.Minute).AddSeconds(-tick.Second);
             tick = tick.AddDays(1);
             raportTimer.Interval = (int)(tick - DateTime.Now).TotalMilliseconds;
             raportTimer.Tick += RaportTimer_Tick;
             raportTimer.Start();
+        }
+
+        private void LoadImages()
+        {
+            Bitmap img;
+
+            var svgDoc = Svg.SvgDocument.Open("./imgs/next.svg");
+            svgDoc.Width = svgDoc.Height = cmdNext.Width;
+            img = svgDoc.Draw();
+            cmdNext.Image = img;
+
+            svgDoc = Svg.SvgDocument.Open("./imgs/add.svg");
+            svgDoc.Width = svgDoc.Height = cmdAdd.Width;
+            img = svgDoc.Draw();
+            cmdAdd.Image = img;
+
+            svgDoc = Svg.SvgDocument.Open("./imgs/presenter.svg");
+            svgDoc.Width = svgDoc.Height = cmdShowPresenter.Width;
+            img = svgDoc.Draw();
+            cmdShowPresenter.Image = img;
+
+            svgDoc = Svg.SvgDocument.Open("./imgs/raport.svg");
+            svgDoc.Width = svgDoc.Height = cmdRaport.Width;
+            img = svgDoc.Draw();
+            cmdRaport.Image = img;
+
+            svgDoc = Svg.SvgDocument.Open("./imgs/settings.svg");
+            svgDoc.Width = svgDoc.Height = cmdSettings.Width;
+            img = svgDoc.Draw();
+            cmdSettings.Image = img;
         }
 
         private void RaportTimer_Tick(object sender, EventArgs e)
@@ -502,6 +543,8 @@ namespace TruckEntryList
             RaportSelect rs = new RaportSelect();
             if (rs.ShowDialog() == DialogResult.OK)
             {
+                SavingState = SavingStates.Saving;
+
                 string file = Path.GetFullPath(PresenterSettings.raportFolder);
                 if (!file.EndsWith(Path.DirectorySeparatorChar.ToString())) file += Path.DirectorySeparatorChar.ToString();
                 file += "Raport " + rs.raportDate.Value.ToString("yyyy.MM.dd") + ".xlsx";
@@ -515,10 +558,61 @@ namespace TruckEntryList
                     if (ofd.ShowDialog() == DialogResult.OK)
                         file = ofd.FileName;
                 }
+
+                BackgroundWorker bw = new BackgroundWorker();
+                bw.DoWork += Bw_DoWork;
+                bw.RunWorkerAsync(400);
+
                 CreateRaport(rs.raportDate.Value, file);
+                SavingState = SavingStates.Saved;
             }
             rs.Dispose();
-            // TODO: Check last raport made and go from there.
+        }
+
+        private Bitmap GetRaportImage(Color color)
+        {
+            Bitmap img;
+            var svgDoc = Svg.SvgDocument.Open("./imgs/raport.svg");
+            svgDoc.Children[0].Fill = new Svg.SvgColourServer(color);
+            svgDoc.Width = svgDoc.Height = cmdRaport.Width;
+            img = svgDoc.Draw();
+
+            return img;
+        }
+
+        private void Bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            int sleepTime;
+            int? nst = e.Argument as int?;
+            if (nst == null)
+                sleepTime = 200;
+            else sleepTime = nst.Value;
+            while (true)
+            {
+                if (SavingState == SavingStates.Saving)
+                {
+                    cmdRaport.Image = GetRaportImage(Color.Red);
+                    SavingState = SavingStates.SavingRed;
+                    System.Threading.Thread.Sleep(sleepTime);
+                }
+                else if (SavingState == SavingStates.SavingRed)
+                {
+                    cmdRaport.Image = GetRaportImage(Color.Black);
+                    SavingState = SavingStates.Saving;
+                    System.Threading.Thread.Sleep(sleepTime);
+                }
+                else if (SavingState == SavingStates.Saved)
+                {
+                    cmdRaport.Image = GetRaportImage(Color.Green);
+                    SavingState = SavingStates.SavedGreen;
+                    System.Threading.Thread.Sleep(sleepTime + 300);
+                }
+                else if (SavingState == SavingStates.SavedGreen)
+                {
+                    cmdRaport.Image = GetRaportImage(Color.Black);
+                    break;
+                }
+            }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
