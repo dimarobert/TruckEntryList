@@ -96,32 +96,34 @@ namespace TruckEntryList
 
         private void LoadImages()
         {
+            cmdNext.Image = LoadSvgImage("./imgs/next.svg", cmdNext.Width);
+            cmdAdd.Image = LoadSvgImage("./imgs/add.svg", cmdAdd.Width);
+            cmdShowPresenter.Image = LoadSvgImage("./imgs/presenter.svg", cmdShowPresenter.Width);
+            cmdRaport.Image = LoadSvgImage("./imgs/raport.svg", cmdRaport.Width);
+            cmdSettings.Image = LoadSvgImage("./imgs/settings.svg", cmdSettings.Width);
+        }
+
+        /// <summary>
+        /// If height is not specified it will get the width value.
+        /// </summary>
+        private Bitmap LoadSvgImage(string imgFile, int width, int height = -1)
+        {
+            if (!File.Exists(imgFile))
+                return null;
+
+            if (width < 0)
+                throw new ArgumentOutOfRangeException("width must be positive!");
+
+            if (height == -1)
+                height = width;
+
             Bitmap img;
 
-            var svgDoc = Svg.SvgDocument.Open("./imgs/next.svg");
-            svgDoc.Width = svgDoc.Height = cmdNext.Width;
+            var svgDoc = Svg.SvgDocument.Open(imgFile);
+            svgDoc.Width = width;
+            svgDoc.Height = height;
             img = svgDoc.Draw();
-            cmdNext.Image = img;
-
-            svgDoc = Svg.SvgDocument.Open("./imgs/add.svg");
-            svgDoc.Width = svgDoc.Height = cmdAdd.Width;
-            img = svgDoc.Draw();
-            cmdAdd.Image = img;
-
-            svgDoc = Svg.SvgDocument.Open("./imgs/presenter.svg");
-            svgDoc.Width = svgDoc.Height = cmdShowPresenter.Width;
-            img = svgDoc.Draw();
-            cmdShowPresenter.Image = img;
-
-            svgDoc = Svg.SvgDocument.Open("./imgs/raport.svg");
-            svgDoc.Width = svgDoc.Height = cmdRaport.Width;
-            img = svgDoc.Draw();
-            cmdRaport.Image = img;
-
-            svgDoc = Svg.SvgDocument.Open("./imgs/settings.svg");
-            svgDoc.Width = svgDoc.Height = cmdSettings.Width;
-            img = svgDoc.Draw();
-            cmdSettings.Image = img;
+            return img;
         }
 
         private void RaportTimer_Tick(object sender, EventArgs e)
@@ -315,7 +317,6 @@ namespace TruckEntryList
             using (StreamWriter sw = new StreamWriter(dataFile, true))
             {
                 entry.WriteObject(sw.BaseStream);
-                //sw.WriteLine(entry.ToString());
             }
         }
 
@@ -328,23 +329,8 @@ namespace TruckEntryList
                 s.Close();
             }
 
-            using (Stream stream = File.Open(completedFile, FileMode.Open, FileAccess.ReadWrite))
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                byte[] posByte = new byte[4];
-                if (stream.Length != 0)
-                {
-                    stream.Read(posByte, 0, 4);
-                }
-                else posByte = BitConverter.GetBytes(0);
-                int pos = BitConverter.ToInt32(posByte, 0);
-                entry.nrCrt = ++pos;
-                stream.Seek(0, SeekOrigin.Begin);
-                stream.Write(BitConverter.GetBytes(pos), 0, 4);
-                stream.Seek(0, SeekOrigin.End);
-                entry.WriteObject(stream);
-
-            }
+            if (!FileManager.AddToFile(completedFile, entry))
+                MessageBox.Show("Eroare la scrierea in fisier. (0x01)");
         }
 
         private void AddToList(TruckInfo entry)
