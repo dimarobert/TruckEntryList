@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem(new string[] {
             "999",
             "CL-999-DDD",
             "Rapita",
@@ -57,11 +57,12 @@
             this.lstTruckOrder.ForeColor = System.Drawing.Color.White;
             this.lstTruckOrder.FullRowSelect = true;
             this.lstTruckOrder.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
-            this.lstTruckOrder.Location = new System.Drawing.Point(876, 8);
+            listViewItem3});
+            this.lstTruckOrder.Location = new System.Drawing.Point(1168, 10);
+            this.lstTruckOrder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.lstTruckOrder.MultiSelect = false;
             this.lstTruckOrder.Name = "lstTruckOrder";
-            this.lstTruckOrder.Size = new System.Drawing.Size(315, 522);
+            this.lstTruckOrder.Size = new System.Drawing.Size(419, 642);
             this.lstTruckOrder.TabIndex = 7;
             this.lstTruckOrder.UseCompatibleStateImageBehavior = false;
             this.lstTruckOrder.View = System.Windows.Forms.View.Details;
@@ -90,10 +91,9 @@
             // lblNrAuto
             // 
             this.lblNrAuto.ForeColor = System.Drawing.Color.White;
-            this.lblNrAuto.Location = new System.Drawing.Point(278, 172);
-            this.lblNrAuto.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblNrAuto.Location = new System.Drawing.Point(371, 212);
             this.lblNrAuto.Name = "lblNrAuto";
-            this.lblNrAuto.Size = new System.Drawing.Size(75, 19);
+            this.lblNrAuto.Size = new System.Drawing.Size(100, 23);
             this.lblNrAuto.TabIndex = 8;
             this.lblNrAuto.Text = "A-99-AAA";
             this.lblNrAuto.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -101,10 +101,9 @@
             // lblPayload
             // 
             this.lblPayload.ForeColor = System.Drawing.Color.White;
-            this.lblPayload.Location = new System.Drawing.Point(172, 267);
-            this.lblPayload.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblPayload.Location = new System.Drawing.Point(229, 329);
             this.lblPayload.Name = "lblPayload";
-            this.lblPayload.Size = new System.Drawing.Size(75, 19);
+            this.lblPayload.Size = new System.Drawing.Size(100, 23);
             this.lblPayload.TabIndex = 9;
             this.lblPayload.Text = "label2";
             this.lblPayload.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -112,10 +111,9 @@
             // lblHour
             // 
             this.lblHour.ForeColor = System.Drawing.Color.White;
-            this.lblHour.Location = new System.Drawing.Point(285, 20);
-            this.lblHour.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblHour.Location = new System.Drawing.Point(380, 25);
             this.lblHour.Name = "lblHour";
-            this.lblHour.Size = new System.Drawing.Size(75, 19);
+            this.lblHour.Size = new System.Drawing.Size(100, 23);
             this.lblHour.TabIndex = 10;
             this.lblHour.Text = "label1";
             this.lblHour.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -123,10 +121,9 @@
             // lblNextTruck
             // 
             this.lblNextTruck.ForeColor = System.Drawing.Color.White;
-            this.lblNextTruck.Location = new System.Drawing.Point(110, 499);
-            this.lblNextTruck.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblNextTruck.Location = new System.Drawing.Point(147, 614);
             this.lblNextTruck.Name = "lblNextTruck";
-            this.lblNextTruck.Size = new System.Drawing.Size(75, 19);
+            this.lblNextTruck.Size = new System.Drawing.Size(100, 23);
             this.lblNextTruck.TabIndex = 11;
             this.lblNextTruck.Text = "label1";
             this.lblNextTruck.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -135,10 +132,11 @@
             // 
             this.label1.BackColor = System.Drawing.Color.Red;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label1.Location = new System.Drawing.Point(8, 8);
-            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.ForeColor = System.Drawing.Color.MediumBlue;
+            this.label1.Location = new System.Drawing.Point(11, 10);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(22, 24);
+            this.label1.Padding = new System.Windows.Forms.Padding(5);
+            this.label1.Size = new System.Drawing.Size(40, 40);
             this.label1.TabIndex = 12;
             this.label1.Text = "X";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -148,17 +146,17 @@
             // 
             // Presenter
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1203, 637);
+            this.ClientSize = new System.Drawing.Size(1604, 784);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lstTruckOrder);
             this.Controls.Add(this.lblNextTruck);
             this.Controls.Add(this.lblHour);
             this.Controls.Add(this.lblPayload);
             this.Controls.Add(this.lblNrAuto);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Presenter";
             this.Text = "Presenter";
             this.Load += new System.EventHandler(this.Presenter_Load);

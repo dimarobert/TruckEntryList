@@ -102,7 +102,7 @@ namespace TruckEntryList
                 this.Size = new Size(currentScreen.WorkingArea.Width, currentScreen.WorkingArea.Height);
 
                 label1.Visible = true;
-                label1.Location = new Point(10, 10);
+                label1.Location = new Point(5, 5);
             }
             else if(this.windowState == FormWindowState.Normal)
             {
@@ -248,11 +248,13 @@ namespace TruckEntryList
         private void label1_MouseEnter(object sender, EventArgs e)
         {
             label1.BackColor = Color.Blue;
+            label1.ForeColor = Color.Red;
         }
 
         private void label1_MouseLeave(object sender, EventArgs e)
         {
             label1.BackColor = Color.Red;
+            label1.ForeColor = Color.MediumBlue;
         }
 
         private void lstTruckOrder_SelectedIndexChanged(object sender, EventArgs e)

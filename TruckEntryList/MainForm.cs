@@ -294,7 +294,21 @@ namespace TruckEntryList
             if (!File.Exists(dataFile))
                 return;
 
-            using (Stream stream = File.Open(dataFile, FileMode.Open))
+            using (FixedObjectFileStream stream = new FixedObjectFileStream(dataFile, FileMode.Open, FileAccess.ReadWrite))
+            {
+                TruckInfo[] tis = new TruckInfo[stream.Length];
+                stream.Read(tis, 0, (int)stream.Length);
+                foreach (TruckInfo ti in tis)
+                {
+                    EntryData.Add(ti);
+                    AddToList(ti);
+                    AutoIncrementNrCrt = ti.nrCrt + 1;
+                }
+
+            }
+
+
+            /*using (Stream stream = File.Open(dataFile, FileMode.Open))
             {
                 while (stream.Position < stream.Length)
                 {
@@ -304,7 +318,7 @@ namespace TruckEntryList
                     AutoIncrementNrCrt = ti.nrCrt + 1;
 
                 }
-            }
+            }*/
 
             if (PropertyChanged != null)
             {
@@ -314,14 +328,19 @@ namespace TruckEntryList
 
         private void AddEntryToFile(TruckInfo entry)
         {
-            using (StreamWriter sw = new StreamWriter(dataFile, true))
+            using (FixedObjectFileStream fos = new FixedObjectFileStream(dataFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, true))
+            {
+                fos.Write(new TruckInfo[] { entry }, 0, 1);
+            }
+            /*using (StreamWriter sw = new StreamWriter(dataFile, true))
             {
                 entry.WriteObject(sw.BaseStream);
-            }
+            }*/
         }
 
         private void AddEntryToCompleted(TruckInfo entry)
         {
+
             if (!File.Exists(completedFile))
             {
                 Stream s = File.Create(completedFile);
@@ -329,8 +348,14 @@ namespace TruckEntryList
                 s.Close();
             }
 
-            if (!FileManager.AddToFile(completedFile, entry))
-                MessageBox.Show("Eroare la scrierea in fisier. (0x01)");
+            using (FixedObjectFileStream stream = new FixedObjectFileStream(completedFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, true))
+            {
+                entry.nrCrt = stream.NumberOfObjects + 1;
+                stream.Write(new TruckInfo[] { entry }, 0, 1);
+            }
+
+            /*if (!FileManager.AddToFile(completedFile, entry))
+                MessageBox.Show("Eroare la scrierea in fisier. (0x01)");*/
         }
 
         private void AddToList(TruckInfo entry)
@@ -412,7 +437,29 @@ namespace TruckEntryList
         {
             if (lstTruckOrder.SelectedItems.Count == 1)
             {
-                using (Stream stream = File.Open(dataFile, FileMode.Open, FileAccess.ReadWrite))
+                using (FixedObjectFileStream stream = new FixedObjectFileStream(dataFile, FileMode.Open, FileAccess.ReadWrite))
+                {
+                    int position = lstTruckOrder.SelectedIndices[0] + 1;
+                    int len;
+                    stream.Seek(position, SeekOrigin.Begin);
+                    TruckInfo[] buffer = new TruckInfo[10];
+                    while ((len = stream.Read(buffer, 0, 10)) > 0)
+                    {
+                        foreach (TruckInfo ti in buffer)
+                        {
+                            ti.nrCrt--;
+                            if (EntryData != null)
+                                EntryData[ti.nrCrt].nrCrt--;
+                        }
+                        stream.Seek(-len - 1, SeekOrigin.Current);
+                        stream.Write(buffer, 0, len);
+                        stream.Seek(1, SeekOrigin.Current);
+                    }
+                    stream.SetLength(stream.Length - 1);
+                }
+
+
+                /*using (Stream stream = File.Open(dataFile, FileMode.Open, FileAccess.ReadWrite))
                 {
 
                     int position, length, nrcrt;
@@ -445,11 +492,15 @@ namespace TruckEntryList
                         nrcrt++;
                     }
                     stream.SetLength(stream.Length - TruckInfo.sizeInBytes);
+                }*/
+                if (EntryData != null)
+                {
+                    EntryData.RemoveAt(lstTruckOrder.SelectedIndices[0]);
+                    AutoIncrementNrCrt = EntryData.Count == 0 ? 1 : EntryData.Last().nrCrt + 1;
                 }
+                if (lstTruckOrder != null)
+                    lstTruckOrder.Items.Remove(lstTruckOrder.SelectedItems[0]);
 
-                EntryData.RemoveAt(lstTruckOrder.SelectedIndices[0]);
-                lstTruckOrder.Items.Remove(lstTruckOrder.SelectedItems[0]);
-                AutoIncrementNrCrt = EntryData.Count == 0 ? 1 : EntryData.Last().nrCrt + 1;
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("EntryData"));
@@ -467,7 +518,26 @@ namespace TruckEntryList
             EntryData[0].dateEntry = DateTime.Now;
             AddEntryToCompleted(EntryData[0]);
 
-            using (Stream stream = File.Open(dataFile, FileMode.Open, FileAccess.ReadWrite))
+            using (FixedObjectFileStream stream = new FixedObjectFileStream(dataFile, FileMode.Open, FileAccess.ReadWrite))
+            {
+                stream.Seek(1, SeekOrigin.Begin);
+                TruckInfo ti = new TruckInfo();
+                while (stream.Read(new TruckInfo[] { ti }, 0, 1) == 1)
+                {
+                    ti.nrCrt--;
+                    if (EntryData != null)
+                        EntryData[ti.nrCrt].nrCrt--;
+                    if (lstTruckOrder != null)
+                        lstTruckOrder.Items[ti.nrCrt].Text = ti.nrCrt.ToString();
+
+                    stream.Seek(-2, SeekOrigin.Current);
+                    stream.Write(new TruckInfo[] { ti }, 0, 1);
+                    stream.Seek(1, SeekOrigin.Current);
+                }
+                stream.SetLength(stream.Length - 1);
+            }
+
+            /*using (Stream stream = File.Open(dataFile, FileMode.Open, FileAccess.ReadWrite))
             {
                 stream.Seek(TruckInfo.sizeInBytes, SeekOrigin.Begin);
 
@@ -483,12 +553,14 @@ namespace TruckEntryList
                     stream.Seek(TruckInfo.sizeInBytes, SeekOrigin.Current);
                 }
                 stream.SetLength(stream.Length - TruckInfo.sizeInBytes);
+            }*/
+            if (EntryData != null)
+            {
+                EntryData.RemoveAt(0);
+                AutoIncrementNrCrt = EntryData.Count == 0 ? 1 : EntryData.Last().nrCrt + 1;
             }
-
-            EntryData.RemoveAt(0);
-            lstTruckOrder.Items.RemoveAt(0);
-
-            AutoIncrementNrCrt = EntryData.Count == 0 ? 1 : EntryData.Last().nrCrt + 1;
+            if (lstTruckOrder != null)
+                lstTruckOrder.Items.RemoveAt(0);
 
             if (PropertyChanged != null)
             {

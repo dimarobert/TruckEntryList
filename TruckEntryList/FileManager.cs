@@ -43,15 +43,6 @@ namespace TruckEntryList
             return true;
         }
 
-        public static Stream GetFileStream(string file, out int itemsCount)
-        {
-            Stream ret = File.Open(file, FileMode.Open);
-
-            byte[] buff = new byte[4];
-            ret.Read(buff, 0, 4);
-            itemsCount = BitConverter.ToInt32(buff, 0);
-            return ret;
-        }
     }
 
     public class FixedObjectFileStream : FileStream
@@ -59,10 +50,12 @@ namespace TruckEntryList
         private bool openedAsStream;
         private int numberOfObjects;
         public int NumberOfObjects { get { return numberOfObjects; } }
-        public FixedObjectFileStream(string file, FileMode mode = FileMode.Open, FileAccess access = FileAccess.ReadWrite) : base(file, mode, access)
+
+        public FixedObjectFileStream(string file, FileMode mode, FileAccess access, bool append = false) : base(file, mode, access)
         {
+
             openedAsStream = false;
-            if (mode == FileMode.Open && base.Length == 0)
+            if (mode == FileMode.Open && access == FileAccess.Read && base.Length == 0)
             {
                 throw new ArgumentException("Not a FixedObject File!");
             }
@@ -71,15 +64,22 @@ namespace TruckEntryList
                 numberOfObjects = 0;
                 base.Write(BitConverter.GetBytes(0), 0, 4);
             }
+            else if(mode == FileMode.Append)
+            {
+                throw new ArgumentException("FixedObject File cannot be opened in Append mode!");
+            }
             else
             {
                 byte[] buff = new byte[4];
                 base.Read(buff, 0, 4);
                 numberOfObjects = BitConverter.ToInt32(buff, 0);
             }
+
+            if (append)
+                base.Seek(0, SeekOrigin.End);
         }
 
-        public FixedObjectFileStream(Stream stream) : base("./FixedObjectFileStream_tmp", FileMode.Create)
+        public FixedObjectFileStream(Stream stream) : base("./FixedObjectFileStream_tmp", FileMode.Create, FileAccess.ReadWrite)
         {
             openedAsStream = true;
 
@@ -108,7 +108,7 @@ namespace TruckEntryList
         {
             get
             {
-                return base.Length - 4;
+                return (base.Length - 4) / TruckInfo.sizeInBytes;
             }
         }
 
@@ -116,12 +116,12 @@ namespace TruckEntryList
         {
             get
             {
-                return base.Position - 4;
+                return (base.Position - 4) / TruckInfo.sizeInBytes;
             }
 
             set
             {
-                base.Position = value + 4;
+                base.Position = value * TruckInfo.sizeInBytes + 4;
             }
         }
 
@@ -149,6 +149,7 @@ namespace TruckEntryList
 
         public override long Seek(long offset, SeekOrigin origin)
         {
+            offset *= TruckInfo.sizeInBytes;
             if (origin == SeekOrigin.Begin)
                 if (offset < 0)
                     return base.Seek(offset, origin);
@@ -164,8 +165,8 @@ namespace TruckEntryList
         public override void SetLength(long value)
         {
             if (value >= 0)
-                base.SetLength(value + 4);
-            else base.SetLength(value);
+                base.SetLength(value * TruckInfo.sizeInBytes + 4);
+            else base.SetLength(value * TruckInfo.sizeInBytes);
         }
 
         public override void Write(byte[] buffer, int offset, int count)
@@ -179,13 +180,18 @@ namespace TruckEntryList
             byte[] buffer = new byte[TruckInfo.sizeInBytes];
             MemoryStream ms = new MemoryStream(buffer);
 
-            while (actualOffset <= count + offset)
+            while (actualOffset < count + offset)
             {
                 ms.Seek(0, SeekOrigin.Begin);
                 entries[actualOffset++].WriteObject(ms);
 
                 base.Write(buffer, 0, TruckInfo.sizeInBytes);
             }
+
+            long pos = base.Position;
+            base.Seek(0, SeekOrigin.Begin);
+            base.Write(BitConverter.GetBytes(numberOfObjects + count), 0, 4);
+            base.Position = pos;
         }
     }
 }
