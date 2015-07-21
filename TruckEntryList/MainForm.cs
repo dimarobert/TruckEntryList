@@ -521,17 +521,18 @@ namespace TruckEntryList
             using (FixedObjectFileStream stream = new FixedObjectFileStream(dataFile, FileMode.Open, FileAccess.ReadWrite))
             {
                 stream.Seek(1, SeekOrigin.Begin);
-                TruckInfo ti = new TruckInfo();
-                while (stream.Read(new TruckInfo[] { ti }, 0, 1) == 1)
+                TruckInfo[] ti = new TruckInfo[1];
+                ti[0] = new TruckInfo();
+                while (stream.Read(ti, 0, 1) == 1)
                 {
-                    ti.nrCrt--;
+                    ti[0].nrCrt--;
                     if (EntryData != null)
-                        EntryData[ti.nrCrt].nrCrt--;
+                        EntryData[ti[0].nrCrt].nrCrt--;
                     if (lstTruckOrder != null)
-                        lstTruckOrder.Items[ti.nrCrt].Text = ti.nrCrt.ToString();
+                        lstTruckOrder.Items[ti[0].nrCrt].Text = ti[0].nrCrt.ToString();
 
                     stream.Seek(-2, SeekOrigin.Current);
-                    stream.Write(new TruckInfo[] { ti }, 0, 1);
+                    stream.Write(ti, 0, 1);
                     stream.Seek(1, SeekOrigin.Current);
                 }
                 stream.SetLength(stream.Length - 1);

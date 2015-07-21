@@ -193,5 +193,7 @@ namespace TruckEntryList
             base.Write(BitConverter.GetBytes(numberOfObjects + count), 0, 4);
             base.Position = pos;
         }
+
+        // TODO: Object add/remove instead of Read/Write to be able to keep count
     }
 }
