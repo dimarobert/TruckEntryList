@@ -5,37 +5,37 @@ using System.Linq;
 using System.Text;
 
 namespace TruckEntryList {
-    public static class FileManager {
+    //public static class FileManager {
 
-        public static bool AddToFile(string file, TruckInfo entry) {
-            using (Stream stream = File.Open(file, FileMode.Open, FileAccess.ReadWrite)) {
-                return AddToFile(stream, entry);
-            }
-        }
+    //    public static bool AddToFile(string file, TruckInfo entry) {
+    //        using (Stream stream = File.Open(file, FileMode.Open, FileAccess.ReadWrite)) {
+    //            return AddToFile(stream, entry);
+    //        }
+    //    }
 
-        public static bool AddToFile(Stream stream, TruckInfo entry) {
-            if (!stream.CanRead || !stream.CanWrite || !stream.CanSeek)
-                return false;
+    //    public static bool AddToFile(Stream stream, TruckInfo entry) {
+    //        if (!stream.CanRead || !stream.CanWrite || !stream.CanSeek)
+    //            return false;
 
-            stream.Seek(0, SeekOrigin.Begin);
-            byte[] posByte = new byte[4];
-            if (stream.Length != 0) {
-                stream.Read(posByte, 0, 4);
-            } else posByte = BitConverter.GetBytes(0);
-            int pos = BitConverter.ToInt32(posByte, 0);
-            entry.nrCrt = ++pos;
-            stream.Seek(0, SeekOrigin.Begin);
-            stream.Write(BitConverter.GetBytes(pos), 0, 4);
-            stream.Seek(0, SeekOrigin.End);
-            entry.WriteObject(stream);
-            return true;
-        }
+    //        stream.Seek(0, SeekOrigin.Begin);
+    //        byte[] posByte = new byte[4];
+    //        if (stream.Length != 0) {
+    //            stream.Read(posByte, 0, 4);
+    //        } else posByte = BitConverter.GetBytes(0);
+    //        int pos = BitConverter.ToInt32(posByte, 0);
+    //        entry.nrCrt = ++pos;
+    //        stream.Seek(0, SeekOrigin.Begin);
+    //        stream.Write(BitConverter.GetBytes(pos), 0, 4);
+    //        stream.Seek(0, SeekOrigin.End);
+    //        entry.WriteObject(stream);
+    //        return true;
+    //    }
 
-        public static bool ReplaceInFile() {
-            return true;
-        }
+    //    public static bool ReplaceInFile() {
+    //        return true;
+    //    }
 
-    }
+    //}
 
     public class FixedObjectFileStream : FileStream {
         public static string TempStreamFile = Path.GetTempFileName();
