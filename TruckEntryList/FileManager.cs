@@ -38,13 +38,12 @@ namespace TruckEntryList {
     }
 
     public class FixedObjectFileStream : FileStream {
-        private bool openedAsStream;
+        public static string TempStreamFile = Path.GetTempFileName();
         private int numberOfObjects;
         public int NumberOfObjects { get { return numberOfObjects; } }
 
         public FixedObjectFileStream(string file, FileMode mode, FileAccess access, bool append = false) : base(file, mode, access) {
 
-            openedAsStream = false;
             if (mode == FileMode.Open && access == FileAccess.Read && base.Length == 0) {
                 throw new ArgumentException("Not a FixedObject File!");
             } else if (base.Length == 0) {
@@ -62,25 +61,39 @@ namespace TruckEntryList {
                 base.Seek(0, SeekOrigin.End);
         }
 
-        public FixedObjectFileStream(Stream stream) : base("./FixedObjectFileStream_tmp", FileMode.Create, FileAccess.ReadWrite) {
-            openedAsStream = true;
+        public FixedObjectFileStream(Stream stream) : base(TempStreamFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose) {
 
             byte[] buffer = new byte[4096];
             int sz;
+            bool empty = true;
             while ((sz = stream.Read(buffer, 0, 4096)) > 0) {
                 base.Write(buffer, 0, sz);
+                empty = false;
             }
+
+            if (empty) {
+                base.Seek(0, SeekOrigin.Begin);
+                base.Write(BitConverter.GetBytes(0), 0, 4);
+            }
+
             base.Seek(0, SeekOrigin.Begin);
 
             base.Read(buffer, 0, 4);
             numberOfObjects = BitConverter.ToInt32(buffer, 0);
         }
 
-        ~FixedObjectFileStream() {
-            if (openedAsStream) {
-                if (File.Exists("./FixedObjectFileStream_tmp"))
-                    File.Delete("./FixedObjectFileStream_tmp");
+        public void FillTestStream(Stream ms) {
+            ms.Seek(0, SeekOrigin.Begin);
+            long pos = base.Position;
+            base.Seek(0, SeekOrigin.Begin);
+            byte[] buff = new byte[4096];
+            int sz;
+            while ((sz = base.Read(buff, 0, 4096)) > 0) {
+                ms.Write(buff, 0, sz);
             }
+            ms.Seek(0, SeekOrigin.Begin);
+
+            base.Position = pos;
         }
 
         public override long Length {
@@ -175,7 +188,7 @@ namespace TruckEntryList {
             Seek(position + 1, SeekOrigin.Begin);
             TruckInfo[] buffer = new TruckInfo[10];
             while ((len = Read(buffer, 0, 10)) > 0) {
-                for (int i = 0; i < len;i++) {
+                for (int i = 0; i < len; i++) {
                     buffer[i].nrCrt--;
                 }
                 Seek(-len - 1, SeekOrigin.Current);

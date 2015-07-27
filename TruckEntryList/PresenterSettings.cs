@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Xml;
 
-namespace TruckEntryList
-{
+namespace TruckEntryList {
     public static class PresenterSettings
     {
         public static float hourZone { get { return (float)Properties.Settings.Default["hourZone"]; } set { Properties.Settings.Default["hourZone"] = value; Save(); } }

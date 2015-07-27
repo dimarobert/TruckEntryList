@@ -3,39 +3,34 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace TruckEntryList
-{
-    public class TruckInfo
-    {
+namespace TruckEntryList {
+    public class TruckInfo {
         public const int sizeInBytes = 122;
 
-        public TruckInfo() { }
+        public TruckInfo() {
+            _payload = "";
+            _nrAuto = "";
+        }
 
         public TruckInfo(Stream s) { ReadObject(s); }
 
         public int nrCrt { get; set; }
         private string _nrAuto;
-        public string nrAuto
-        {
+        public string nrAuto {
             get { return _nrAuto; }
-            set
-            {
+            set {
                 if (value.Length > 10) throw new ArgumentException("Maximum length of this property is 10.");
                 var s = value.Split(new char[] { '-', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (s.Length == 3)
-                {
-                    _nrAuto = String.Join("-", s);
-                }
-                else throw new ArgumentException();
+                if (s.Length == 3) {
+                    _nrAuto = String.Join("-", s).ToUpper();
+                } else throw new ArgumentException();
             }
         }
 
         private string _payload;
-        public string payload
-        {
+        public string payload {
             get { return _payload; }
-            set
-            {
+            set {
                 if (value.Length > 30)
                     throw new ArgumentException("Maximum length of this property is 30.");
                 _payload = value;
@@ -44,49 +39,36 @@ namespace TruckEntryList
         public DateTime dateRegistered { get; set; }
         public DateTime dateEntry { get; set; }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             return nrCrt + "|" + nrAuto + "|" + payload + "|" + dateRegistered;
         }
 
-        public static bool TryParse(string s, out TruckInfo result)
-        {
+        public static bool TryParse(string s, out TruckInfo result) {
             result = null;
             var itemProps = s.Split('|');
 
-            if (itemProps.Length == 4 || itemProps.Length == 5)
-            {
+            if (itemProps.Length == 4 || itemProps.Length == 5) {
                 TruckInfo ti = new TruckInfo();
 
                 int nrcrt;
-                if (int.TryParse(itemProps[0], out nrcrt))
-                {
+                if (int.TryParse(itemProps[0], out nrcrt)) {
                     ti.nrCrt = nrcrt;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
                 ti.nrAuto = itemProps[1];
                 ti.payload = itemProps[2];
                 DateTime time;
-                if (DateTime.TryParseExact(itemProps[3], "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out time))
-                {
+                if (DateTime.TryParseExact(itemProps[3], "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out time)) {
                     ti.dateRegistered = time;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
 
-                if (itemProps.Length == 5)
-                {
-                    if (DateTime.TryParseExact(itemProps[4], "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out time))
-                    {
+                if (itemProps.Length == 5) {
+                    if (DateTime.TryParseExact(itemProps[4], "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out time)) {
                         ti.dateEntry = time;
-                    }
-                    else
-                    {
+                    } else {
                         return false;
                     }
                 }
@@ -97,21 +79,17 @@ namespace TruckEntryList
             return false;
         }
 
-        public static bool TryParse(Stream s, out TruckInfo result)
-        {
+        public static bool TryParse(Stream s, out TruckInfo result) {
             result = new TruckInfo();
-            try
-            {
+            try {
                 result.ReadObject(s);
                 return true;
-            } catch(Exception ex)
-            {
+            } catch (Exception ex) {
                 return false;
             }
         }
 
-        public void WriteObject(Stream stream)
-        {
+        public void WriteObject(Stream stream) {
             byte[] stringBuffer = new byte[60];
             byte[] intBuffer = new byte[4];
 
@@ -136,8 +114,7 @@ namespace TruckEntryList
             stream.Write(stringBuffer, 0, 19);
         }
 
-        public void ReadObject(Stream stream)
-        {
+        public void ReadObject(Stream stream) {
             byte[] stringBuffer = new byte[60];
             byte[] intBuffer = new byte[4];
 
@@ -163,6 +140,14 @@ namespace TruckEntryList
             if (DateTime.TryParseExact(Encoding.ASCII.GetString(stringBuffer).Replace("\0", ""), "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out dt))
                 dateEntry = dt;
             else throw new FormatException("Could not decode the Entry Date.");
+        }
+
+        public static bool operator==(TruckInfo one, TruckInfo other) {
+            return one.nrCrt == other.nrCrt && one.nrAuto == other.nrAuto && one.payload == other.payload && one.dateEntry == other.dateEntry && one.dateRegistered == other.dateRegistered;
+        }
+
+        public static bool operator !=(TruckInfo one, TruckInfo other) {
+            return !(one == other);
         }
     }
 }
