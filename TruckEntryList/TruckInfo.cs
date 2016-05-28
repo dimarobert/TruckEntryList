@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace TruckEntryList {
     public class TruckInfo {
-        public const int sizeInBytes = 122;
+        public const int sizeInBytes = 377;
 
         public TruckInfo() {
             _payload = "";
@@ -39,10 +40,14 @@ namespace TruckEntryList {
         public DateTime dateRegistered { get; set; }
         public DateTime dateEntry { get; set; }
 
+        public string comments { get; set; }
+
+        [Obsolete("Use WriteObject")]
         public override string ToString() {
             return nrCrt + "|" + nrAuto + "|" + payload + "|" + dateRegistered;
         }
 
+        [Obsolete("Use ReadObject")]
         public static bool TryParse(string s, out TruckInfo result) {
             result = null;
             var itemProps = s.Split('|');
@@ -90,11 +95,9 @@ namespace TruckEntryList {
         }
 
         public void WriteObject(Stream stream) {
-            byte[] stringBuffer = new byte[60];
-            byte[] intBuffer = new byte[4];
+            byte[] stringBuffer = new byte[255];
 
-            Buffer.BlockCopy(BitConverter.GetBytes(nrCrt), 0, intBuffer, 0, sizeof(int));
-            stream.Write(intBuffer, 0, sizeof(int));
+            stream.Write(BitConverter.GetBytes(nrCrt), 0, sizeof(int));
 
             Buffer.BlockCopy(Encoding.Unicode.GetBytes(_nrAuto), 0, stringBuffer, 0, Math.Min(20, Encoding.Unicode.GetByteCount(_nrAuto)));
             stream.Write(stringBuffer, 0, 20);
@@ -112,38 +115,46 @@ namespace TruckEntryList {
             date = dateEntry.ToString("HH:mm:ss dd.MM.yyyy");
             Buffer.BlockCopy(Encoding.ASCII.GetBytes(date), 0, stringBuffer, 0, 19);
             stream.Write(stringBuffer, 0, 19);
+
+            Array.Clear(stringBuffer, 0, 255);
+            Buffer.BlockCopy(Encoding.Unicode.GetBytes(comments ?? ""), 0, stringBuffer, 0, (comments ?? "").Length);
+            stream.Write(stringBuffer, 0, 255);
         }
 
         public void ReadObject(Stream stream) {
-            byte[] stringBuffer = new byte[60];
-            byte[] intBuffer = new byte[4];
+            byte[] stringBuffer = new byte[255];
 
-            stream.Read(intBuffer, 0, 4);
-            nrCrt = BitConverter.ToInt32(intBuffer, 0);
+            stream.Read(stringBuffer, 0, 4);
+            nrCrt = BitConverter.ToInt32(stringBuffer, 0);
 
+            Array.Clear(stringBuffer, 0, 20);
             stream.Read(stringBuffer, 0, 20);
-            _nrAuto = Encoding.Unicode.GetString(stringBuffer).Replace("\0", "");
+            _nrAuto = string.Join("", Encoding.Unicode.GetString(stringBuffer).TakeWhile(c => c != '\0'));
 
             Array.Clear(stringBuffer, 0, 20);
             stream.Read(stringBuffer, 0, 60);
-            payload = Encoding.Unicode.GetString(stringBuffer).Replace("\0", "");
+            payload = string.Join("", Encoding.Unicode.GetString(stringBuffer).TakeWhile(c => c != '\0'));
 
             Array.Clear(stringBuffer, 0, 60);
             stream.Read(stringBuffer, 0, 19);
             DateTime dt;
-            if (DateTime.TryParseExact(Encoding.ASCII.GetString(stringBuffer).Replace("\0", ""), "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out dt))
+            if (DateTime.TryParseExact(string.Join("", Encoding.ASCII.GetString(stringBuffer).TakeWhile(c => c != '\0')), "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out dt))
                 dateRegistered = dt;
             else throw new FormatException("Could not decode the Registration Date.");
 
             Array.Clear(stringBuffer, 0, 19);
             stream.Read(stringBuffer, 0, 19);
-            if (DateTime.TryParseExact(Encoding.ASCII.GetString(stringBuffer).Replace("\0", ""), "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out dt))
+            if (DateTime.TryParseExact(string.Join("", Encoding.ASCII.GetString(stringBuffer).TakeWhile(c => c != '\0')), "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out dt))
                 dateEntry = dt;
             else throw new FormatException("Could not decode the Entry Date.");
+
+            Array.Clear(stringBuffer, 0, 255);
+            stream.Read(stringBuffer, 0, 255);
+            comments = string.Join("", Encoding.Unicode.GetString(stringBuffer).TakeWhile(c => c != '\0'));
         }
 
-        public static bool operator==(TruckInfo one, TruckInfo other) {
-            return one.nrCrt == other.nrCrt && one.nrAuto == other.nrAuto && one.payload == other.payload && one.dateEntry == other.dateEntry && one.dateRegistered == other.dateRegistered;
+        public static bool operator ==(TruckInfo one, TruckInfo other) {
+            return one.nrCrt == other.nrCrt && one.nrAuto == other.nrAuto && one.payload == other.payload && one.dateEntry == other.dateEntry && one.dateRegistered == other.dateRegistered && one.comments == other.comments;
         }
 
         public static bool operator !=(TruckInfo one, TruckInfo other) {

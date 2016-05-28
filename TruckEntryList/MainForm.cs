@@ -12,6 +12,7 @@ namespace TruckEntryList {
         public event PropertyChangedEventHandler PropertyChanged;
 
         private const string dataFile = "./dataFile.dat";
+        private const string skipFile = "./skipFile.dat";
         private StreamWriter logFile;
         private const string completedFile = "./completedFile.dat";
 
@@ -30,9 +31,17 @@ namespace TruckEntryList {
             get { return entryData; }
             set {
                 entryData = value;
-                if (PropertyChanged != null) {
-                    PropertyChanged(this, new PropertyChangedEventArgs("EntryData"));
-                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EntryData"));
+            }
+        }
+
+
+        private List<TruckInfo> skipData;
+        public List<TruckInfo> SkipData {
+            get { return skipData; }
+            set {
+                skipData = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SkipData"));
             }
         }
 
@@ -52,6 +61,7 @@ namespace TruckEntryList {
             logFile = new StreamWriter(File.Open("./logFile.txt", FileMode.Append));
 
             EntryData = new List<TruckInfo>();
+            SkipData = new List<TruckInfo>();
 
             AutoIncrementNrCrt = 1;
 
@@ -60,6 +70,7 @@ namespace TruckEntryList {
         private void MainForm_Load(object sender, EventArgs e) {
 
             lstTruckOrder.Items.Clear();
+            lstSkip.Items.Clear();
 
             presenter = new Presenter(this);
             presenter.Show();
@@ -90,6 +101,7 @@ namespace TruckEntryList {
             cmdShowPresenter.Image = LoadSvgImage("./imgs/presenter.svg", cmdShowPresenter.Width);
             cmdRaport.Image = LoadSvgImage("./imgs/raport.svg", cmdRaport.Width);
             cmdSettings.Image = LoadSvgImage("./imgs/settings.svg", cmdSettings.Width);
+            cmdSkip.Image = LoadSvgImage("./imgs/skip.svg", cmdSkip.Width);
         }
 
         /// <summary>
@@ -167,10 +179,13 @@ namespace TruckEntryList {
                 excelWs.Cells[3, 5] = "Data Intrare";
                 AddBorder(excelWs.Cells[3, 5], XlBorderWeight.xlThick);
 
+                excelWs.Cells[3, 6] = "Comentarii";
+                AddBorder(excelWs.Cells[3, 6], XlBorderWeight.xlThick);
+
                 int i = 1;
 
                 using (FixedObjectFileStream stream = new FixedObjectFileStream(completedFile, FileMode.Open, FileAccess.ReadWrite)) {
-                    for(int j=0;j<stream.Length;j++) {
+                    for (int j = 0; j < stream.Length; j++) {
                         TruckInfo ti = stream[j];
 
                         if (ti.dateRegistered.ToString("dd.MM.yyyy") != dataRaport)
@@ -181,6 +196,7 @@ namespace TruckEntryList {
                         excelWs.Cells[3 + i, 3] = ti.payload;
                         excelWs.Cells[3 + i, 4] = ti.dateRegistered;
                         excelWs.Cells[3 + i, 5] = ti.dateEntry;
+                        excelWs.Cells[3 + i, 6] = ti.comments;
                         i++;
                     }
                 }
@@ -195,7 +211,7 @@ namespace TruckEntryList {
                     return;
                 }
 
-                Range r = excelWs.Range[excelWs.Cells[1, 1], excelWs.Cells[1, 5]];
+                Range r = excelWs.Range[excelWs.Cells[1, 1], excelWs.Cells[1, 6]];
                 r.EntireColumn.AutoFit();
                 r.HorizontalAlignment = XlHAlign.xlHAlignCenter;
                 foreach (Range rr in r.Columns) {
@@ -254,26 +270,49 @@ namespace TruckEntryList {
 
         private void LoadData() {
             EntryData.Clear();
+            SkipData.Clear();
 
-            if (!File.Exists(dataFile))
-                return;
+            LoadList(EntryData, dataFile, (ti) => {
+                AddToList(ti);
+                AutoIncrementNrCrt = ti.nrCrt + 1;
+            });
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EntryData"));
 
-            using (FixedObjectFileStream stream = new FixedObjectFileStream(dataFile, FileMode.Open, FileAccess.ReadWrite)) {
-                for (int i = 0; i < stream.Length; i++) {
-                    TruckInfo ti = stream[i];
-                    EntryData.Add(ti);
-                    AddToList(ti);
-                    AutoIncrementNrCrt = ti.nrCrt + 1;
+            LoadList(SkipData, skipFile, (ti) => {
+                AddToSkipList(ti);
+            });
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SkipData"));
+        }
+
+        private void LoadList(IList<TruckInfo> list, string filePath, Action<TruckInfo> callback) {
+            if (File.Exists(filePath)) {
+                using (FixedObjectFileStream stream = new FixedObjectFileStream(filePath, FileMode.Open, FileAccess.ReadWrite)) {
+                    for (int i = 0; i < stream.Length; i++) {
+                        TruckInfo ti = stream[i];
+                        list.Add(ti);
+                        callback?.Invoke(ti);
+                    }
                 }
-            }
-
-            if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs("EntryData"));
             }
         }
 
-        private void AddEntryToFile(TruckInfo entry) {
+        private void AddEntryToFile(TruckInfo entry, bool first = false) {
             using (FixedObjectFileStream fos = new FixedObjectFileStream(dataFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, true)) {
+                if (first) {
+                    fos.Insert(0, entry);
+                    for (int i = 1; i < fos.NumberOfObjects; i++) {
+                        var e = fos[i];
+                        e.nrCrt++;
+                        fos[i] = e;
+                    }
+                } else
+                    fos.Add(entry);
+            }
+        }
+
+        private void AddSkipToFile(TruckInfo entry) {
+            using (FixedObjectFileStream fos = new FixedObjectFileStream(skipFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, true)) {
+                entry.nrCrt = fos.NumberOfObjects + 1;
                 fos.Add(entry);
             }
         }
@@ -310,6 +349,41 @@ namespace TruckEntryList {
 
 
             lstTruckOrder.Items.Add(lvi);
+        }
+
+        private void AddToSkipList(TruckInfo entry) {
+            ListViewItem lvi = new ListViewItem();
+            lvi.Text = entry.nrCrt.ToString();
+
+            ListViewItem.ListViewSubItem lvsi = new ListViewItem.ListViewSubItem();
+            lvsi.Text = entry.nrAuto;
+            lvi.SubItems.Add(lvsi);
+
+            lvsi = new ListViewItem.ListViewSubItem();
+            lvsi.Text = entry.comments;
+            lvi.SubItems.Add(lvsi);
+
+            lstSkip.Items.Add(lvi);
+        }
+
+        private void RestoreToList(TruckInfo entry) {
+            ListViewItem lvi = new ListViewItem();
+            lvi.Text = 1.ToString();
+
+            ListViewItem.ListViewSubItem lvsi = new ListViewItem.ListViewSubItem();
+            lvsi.Text = entry.nrAuto;
+            lvi.SubItems.Add(lvsi);
+
+            lvsi = new ListViewItem.ListViewSubItem();
+            lvsi.Text = entry.payload;
+            lvi.SubItems.Add(lvsi);
+
+            lvsi = new ListViewItem.ListViewSubItem();
+            lvsi.Text = entry.dateRegistered.ToString("HH:mm:ss dd.MM.yyyy");
+            lvi.SubItems.Add(lvsi);
+
+            lstTruckOrder.Items.Insert(0, lvi);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EntryData"));
         }
 
         private void PrintError(int lineCount) {
@@ -356,6 +430,12 @@ namespace TruckEntryList {
             }
         }
 
+        private void lstSkip_MouseClick(object sender, MouseEventArgs e) {
+            if (lstSkip.SelectedItems.Count == 1 && e.Button == MouseButtons.Right) {
+                mnuSkipList.Show(lstSkip.PointToScreen(e.Location));
+            }
+        }
+
         private void cmdRemTruck_Click(object sender, EventArgs e) {
             if (lstTruckOrder.SelectedItems.Count == 1) {
                 using (FixedObjectFileStream stream = new FixedObjectFileStream(dataFile, FileMode.Open, FileAccess.ReadWrite)) {
@@ -399,10 +479,39 @@ namespace TruckEntryList {
                 foreach (TruckInfo ti in EntryData)
                     lstTruckOrder.Items[--ti.nrCrt - 1].SubItems[0].Text = ti.nrCrt.ToString();
             }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EntryData"));
+        }
 
-            if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs("EntryData"));
+        private void cmdSkip_Click(object sender, EventArgs e) {
+            if (EntryData.Count == 0) {
+                MessageBox.Show("Nu exista nici o masina in asteptare!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
+            var entry = EntryData[0];
+            CommentForm cForm = new CommentForm();
+            cForm.Comment = entry.comments;
+            cForm.ShowDialog();
+            if (cForm.DialogResult == DialogResult.OK) {
+                entry.comments = cForm.Comment;
+            }
+
+            AddSkipToFile(entry);
+            AddToSkipList(entry);
+            SkipData.Add(entry);
+
+            using (FixedObjectFileStream stream = new FixedObjectFileStream(dataFile, FileMode.Open, FileAccess.ReadWrite)) {
+                stream.RemoveAt(0);
+            }
+
+            if (EntryData != null) {
+                EntryData.RemoveAt(0);
+                AutoIncrementNrCrt = EntryData.Count == 0 ? 1 : EntryData.Last().nrCrt + 1;
+                lstTruckOrder.Items.RemoveAt(0);
+
+                foreach (TruckInfo ti in EntryData)
+                    lstTruckOrder.Items[--ti.nrCrt - 1].SubItems[0].Text = ti.nrCrt.ToString();
+            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EntryData"));
         }
 
         private void cmdShowPresenter_Click(object sender, EventArgs e) {
@@ -494,6 +603,37 @@ namespace TruckEntryList {
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
             if (MessageBox.Show("Sunteti sigur ca vreti sa parasiti aplicatia?", "Confirmare", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                 e.Cancel = true;
+        }
+
+        private void cmdReturnToList_Click(object sender, EventArgs e) {
+            if (lstSkip.SelectedItems.Count == 1) {
+                var entry = SkipData[lstSkip.SelectedIndices[0]];
+                entry.nrCrt = 1;
+
+                RestoreToList(entry);
+                AddEntryToFile(entry, true);
+                EntryData.Insert(0, entry);
+                EntryData[0].nrCrt = 0;
+
+                foreach (TruckInfo ti in EntryData)
+                    lstTruckOrder.Items[ti.nrCrt].SubItems[0].Text = (++ti.nrCrt).ToString();
+
+                using (FixedObjectFileStream stream = new FixedObjectFileStream(skipFile, FileMode.Open, FileAccess.ReadWrite)) {
+                    stream.RemoveAt(lstSkip.SelectedIndices[0]);
+
+                    if (SkipData != null)
+                        foreach (TruckInfo ti in SkipData.Skip(lstSkip.SelectedIndices[0] + 1))
+                            lstSkip.Items[--ti.nrCrt].SubItems[0].Text = ti.nrCrt.ToString();
+                }
+
+                if (SkipData != null) {
+                    SkipData.RemoveAt(lstSkip.SelectedIndices[0]);
+                }
+                if (lstSkip != null)
+                    lstSkip.Items.Remove(lstSkip.SelectedItems[0]);
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EntryData"));
+            }
         }
     }
 }

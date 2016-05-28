@@ -34,6 +34,10 @@
             "CL-999-DDD",
             "Rapita",
             "24:99:99 99.99.9999"}, -1);
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem(new string[] {
+            "1",
+            "CL-999-DDD",
+            "Obs"}, -1);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.txtNrAuto = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -55,7 +59,15 @@
             this.cmdSettings = new System.Windows.Forms.Button();
             this.cmdRaport = new System.Windows.Forms.Button();
             this.cmdAdd = new System.Windows.Forms.Button();
+            this.cmdSkip = new System.Windows.Forms.Button();
+            this.lstSkip = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.mnuSkipList = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cmdReturnToList = new System.Windows.Forms.ToolStripMenuItem();
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuTruckList.SuspendLayout();
+            this.mnuSkipList.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtNrAuto
@@ -248,11 +260,70 @@
             this.cmdAdd.UseVisualStyleBackColor = true;
             this.cmdAdd.Click += new System.EventHandler(this.cmdAdd_Click);
             // 
+            // cmdSkip
+            // 
+            this.cmdSkip.Location = new System.Drawing.Point(86, 156);
+            this.cmdSkip.Name = "cmdSkip";
+            this.cmdSkip.Size = new System.Drawing.Size(40, 40);
+            this.cmdSkip.TabIndex = 103;
+            this.cmdSkip.UseVisualStyleBackColor = true;
+            this.cmdSkip.Click += new System.EventHandler(this.cmdSkip_Click);
+            // 
+            // lstSkip
+            // 
+            this.lstSkip.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3});
+            this.lstSkip.FullRowSelect = true;
+            this.lstSkip.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem2});
+            this.lstSkip.Location = new System.Drawing.Point(553, 12);
+            this.lstSkip.MultiSelect = false;
+            this.lstSkip.Name = "lstSkip";
+            this.lstSkip.Size = new System.Drawing.Size(208, 230);
+            this.lstSkip.TabIndex = 104;
+            this.lstSkip.UseCompatibleStateImageBehavior = false;
+            this.lstSkip.View = System.Windows.Forms.View.Details;
+            this.lstSkip.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lstSkip_MouseClick);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Nr.Crt.";
+            this.columnHeader1.Width = 42;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Nr. Auto";
+            this.columnHeader2.Width = 77;
+            // 
+            // mnuSkipList
+            // 
+            this.mnuSkipList.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.mnuSkipList.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cmdReturnToList});
+            this.mnuSkipList.Name = "mnuTruckList";
+            this.mnuSkipList.Size = new System.Drawing.Size(171, 26);
+            // 
+            // cmdReturnToList
+            // 
+            this.cmdReturnToList.Name = "cmdReturnToList";
+            this.cmdReturnToList.Size = new System.Drawing.Size(170, 22);
+            this.cmdReturnToList.Text = "Adauga la inceput";
+            this.cmdReturnToList.Click += new System.EventHandler(this.cmdReturnToList_Click);
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Observatii";
+            this.columnHeader3.Width = 80;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(559, 254);
+            this.ClientSize = new System.Drawing.Size(769, 254);
+            this.Controls.Add(this.lstSkip);
+            this.Controls.Add(this.cmdSkip);
             this.Controls.Add(this.cmdRaport);
             this.Controls.Add(this.cmdSettings);
             this.Controls.Add(this.txtPayload);
@@ -275,6 +346,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.mnuTruckList.ResumeLayout(false);
+            this.mnuSkipList.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -302,6 +374,13 @@
         private System.Windows.Forms.Button cmdShowPresenter;
         private System.Windows.Forms.Button cmdSettings;
         private System.Windows.Forms.Button cmdRaport;
+        private System.Windows.Forms.Button cmdSkip;
+        private System.Windows.Forms.ListView lstSkip;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ToolStripMenuItem cmdReturnToList;
+        private System.Windows.Forms.ContextMenuStrip mnuSkipList;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
     }
 }
 

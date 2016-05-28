@@ -169,9 +169,7 @@ namespace TruckEntryList {
         }
 
 
-        public void Add(TruckInfo entry) {
-            Add(new TruckInfo[] { entry });
-        }
+        public void Add(TruckInfo entry) => Add(new TruckInfo[] { entry });
 
         public void Add(TruckInfo[] entries) {
             base.Seek(0, SeekOrigin.End);
@@ -180,6 +178,28 @@ namespace TruckEntryList {
             long pos = base.Position;
             base.Seek(0, SeekOrigin.Begin);
             base.Write(BitConverter.GetBytes(numberOfObjects += entries.Length), 0, 4);
+            base.Position = pos;
+        }
+
+        public void Insert(int index, TruckInfo entry) => Insert(index, new[] { entry });
+
+        public void Insert(int index, TruckInfo[] entries) {
+            if (index > Length) throw new IndexOutOfRangeException();
+
+            var pos = base.Position;
+
+            Seek(index, SeekOrigin.Begin);
+            var cnt = (int)(Length - index);
+            TruckInfo[] tis = new TruckInfo[cnt];
+            Read(tis, 0, cnt);
+
+            Seek(index, SeekOrigin.Begin);
+            Write(entries, 0, entries.Length);
+            Write(tis, 0, cnt);
+
+            base.Seek(0, SeekOrigin.Begin);
+            numberOfObjects += entries.Length;
+            base.Write(BitConverter.GetBytes(numberOfObjects), 0, 4);
             base.Position = pos;
         }
 
