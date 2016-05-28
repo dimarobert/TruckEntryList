@@ -28,11 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
             "999",
             "CL-999-DDD",
             "Rapita",
             "24:99:99 99.99.9999"}, -1);
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem(new string[] {
+            "1",
+            "CL-999-DDD",
+            "Obs"}, -1);
             this.lstTruckOrder = new System.Windows.Forms.ListView();
             this.nrcrt = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.nrAuto = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -43,6 +47,10 @@
             this.lblHour = new System.Windows.Forms.Label();
             this.lblNextTruck = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.lstSkip = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // lstTruckOrder
@@ -57,12 +65,11 @@
             this.lstTruckOrder.ForeColor = System.Drawing.Color.White;
             this.lstTruckOrder.FullRowSelect = true;
             this.lstTruckOrder.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3});
-            this.lstTruckOrder.Location = new System.Drawing.Point(1168, 10);
-            this.lstTruckOrder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            listViewItem1});
+            this.lstTruckOrder.Location = new System.Drawing.Point(876, 8);
             this.lstTruckOrder.MultiSelect = false;
             this.lstTruckOrder.Name = "lstTruckOrder";
-            this.lstTruckOrder.Size = new System.Drawing.Size(419, 642);
+            this.lstTruckOrder.Size = new System.Drawing.Size(315, 522);
             this.lstTruckOrder.TabIndex = 7;
             this.lstTruckOrder.UseCompatibleStateImageBehavior = false;
             this.lstTruckOrder.View = System.Windows.Forms.View.Details;
@@ -91,9 +98,10 @@
             // lblNrAuto
             // 
             this.lblNrAuto.ForeColor = System.Drawing.Color.White;
-            this.lblNrAuto.Location = new System.Drawing.Point(371, 212);
+            this.lblNrAuto.Location = new System.Drawing.Point(278, 172);
+            this.lblNrAuto.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblNrAuto.Name = "lblNrAuto";
-            this.lblNrAuto.Size = new System.Drawing.Size(100, 23);
+            this.lblNrAuto.Size = new System.Drawing.Size(75, 19);
             this.lblNrAuto.TabIndex = 8;
             this.lblNrAuto.Text = "A-99-AAA";
             this.lblNrAuto.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -101,9 +109,10 @@
             // lblPayload
             // 
             this.lblPayload.ForeColor = System.Drawing.Color.White;
-            this.lblPayload.Location = new System.Drawing.Point(229, 329);
+            this.lblPayload.Location = new System.Drawing.Point(172, 267);
+            this.lblPayload.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblPayload.Name = "lblPayload";
-            this.lblPayload.Size = new System.Drawing.Size(100, 23);
+            this.lblPayload.Size = new System.Drawing.Size(75, 19);
             this.lblPayload.TabIndex = 9;
             this.lblPayload.Text = "label2";
             this.lblPayload.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -111,9 +120,10 @@
             // lblHour
             // 
             this.lblHour.ForeColor = System.Drawing.Color.White;
-            this.lblHour.Location = new System.Drawing.Point(380, 25);
+            this.lblHour.Location = new System.Drawing.Point(285, 20);
+            this.lblHour.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblHour.Name = "lblHour";
-            this.lblHour.Size = new System.Drawing.Size(100, 23);
+            this.lblHour.Size = new System.Drawing.Size(75, 19);
             this.lblHour.TabIndex = 10;
             this.lblHour.Text = "label1";
             this.lblHour.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -121,9 +131,10 @@
             // lblNextTruck
             // 
             this.lblNextTruck.ForeColor = System.Drawing.Color.White;
-            this.lblNextTruck.Location = new System.Drawing.Point(147, 614);
+            this.lblNextTruck.Location = new System.Drawing.Point(110, 499);
+            this.lblNextTruck.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblNextTruck.Name = "lblNextTruck";
-            this.lblNextTruck.Size = new System.Drawing.Size(100, 23);
+            this.lblNextTruck.Size = new System.Drawing.Size(75, 19);
             this.lblNextTruck.TabIndex = 11;
             this.lblNextTruck.Text = "label1";
             this.lblNextTruck.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -133,10 +144,11 @@
             this.label1.BackColor = System.Drawing.Color.Red;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.label1.ForeColor = System.Drawing.Color.MediumBlue;
-            this.label1.Location = new System.Drawing.Point(11, 10);
+            this.label1.Location = new System.Drawing.Point(8, 8);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Padding = new System.Windows.Forms.Padding(5);
-            this.label1.Size = new System.Drawing.Size(40, 40);
+            this.label1.Padding = new System.Windows.Forms.Padding(4);
+            this.label1.Size = new System.Drawing.Size(30, 32);
             this.label1.TabIndex = 12;
             this.label1.Text = "X";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -144,19 +156,54 @@
             this.label1.MouseEnter += new System.EventHandler(this.label1_MouseEnter);
             this.label1.MouseLeave += new System.EventHandler(this.label1_MouseLeave);
             // 
+            // lstSkip
+            // 
+            this.lstSkip.BackColor = System.Drawing.Color.DimGray;
+            this.lstSkip.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3});
+            this.lstSkip.ForeColor = System.Drawing.Color.White;
+            this.lstSkip.FullRowSelect = true;
+            this.lstSkip.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem2});
+            this.lstSkip.Location = new System.Drawing.Point(876, 462);
+            this.lstSkip.MultiSelect = false;
+            this.lstSkip.Name = "lstSkip";
+            this.lstSkip.Size = new System.Drawing.Size(315, 129);
+            this.lstSkip.TabIndex = 105;
+            this.lstSkip.UseCompatibleStateImageBehavior = false;
+            this.lstSkip.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "#";
+            this.columnHeader1.Width = 29;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Nr. Auto";
+            this.columnHeader2.Width = 77;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Observatii";
+            this.columnHeader3.Width = 196;
+            // 
             // Presenter
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1604, 784);
+            this.ClientSize = new System.Drawing.Size(1203, 637);
+            this.Controls.Add(this.lstSkip);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lstTruckOrder);
             this.Controls.Add(this.lblNextTruck);
             this.Controls.Add(this.lblHour);
             this.Controls.Add(this.lblPayload);
             this.Controls.Add(this.lblNrAuto);
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Presenter";
             this.Text = "Presenter";
             this.Load += new System.EventHandler(this.Presenter_Load);
@@ -177,5 +224,9 @@
         private System.Windows.Forms.Label lblHour;
         private System.Windows.Forms.Label lblNextTruck;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ListView lstSkip;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
     }
 }

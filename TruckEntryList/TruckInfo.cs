@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TruckEntryList {
     public class TruckInfo {
-        public const int sizeInBytes = 377;
+        public const int sizeInBytes = 415;
 
         public TruckInfo() {
             _payload = "";
@@ -41,6 +41,8 @@ namespace TruckEntryList {
         public DateTime dateEntry { get; set; }
 
         public string comments { get; set; }
+        public DateTime dateSkip { get; set; }
+        public DateTime dateReturn { get; set; }
 
         [Obsolete("Use WriteObject")]
         public override string ToString() {
@@ -117,8 +119,18 @@ namespace TruckEntryList {
             stream.Write(stringBuffer, 0, 19);
 
             Array.Clear(stringBuffer, 0, 255);
-            Buffer.BlockCopy(Encoding.Unicode.GetBytes(comments ?? ""), 0, stringBuffer, 0, (comments ?? "").Length);
+            Buffer.BlockCopy(Encoding.Unicode.GetBytes(comments ?? ""), 0, stringBuffer, 0, Math.Min(255, Encoding.Unicode.GetByteCount((comments ?? ""))));
             stream.Write(stringBuffer, 0, 255);
+
+            Array.Clear(stringBuffer, 0, 255);
+            date = dateSkip.ToString("HH:mm:ss dd.MM.yyyy");
+            Buffer.BlockCopy(Encoding.ASCII.GetBytes(date), 0, stringBuffer, 0, 19);
+            stream.Write(stringBuffer, 0, 19);
+
+            Array.Clear(stringBuffer, 0, 255);
+            date = dateReturn.ToString("HH:mm:ss dd.MM.yyyy");
+            Buffer.BlockCopy(Encoding.ASCII.GetBytes(date), 0, stringBuffer, 0, 19);
+            stream.Write(stringBuffer, 0, 19);
         }
 
         public void ReadObject(Stream stream) {
@@ -151,10 +163,22 @@ namespace TruckEntryList {
             Array.Clear(stringBuffer, 0, 255);
             stream.Read(stringBuffer, 0, 255);
             comments = string.Join("", Encoding.Unicode.GetString(stringBuffer).TakeWhile(c => c != '\0'));
+
+            Array.Clear(stringBuffer, 0, 255);
+            stream.Read(stringBuffer, 0, 19);
+            if (DateTime.TryParseExact(string.Join("", Encoding.ASCII.GetString(stringBuffer).TakeWhile(c => c != '\0')), "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out dt))
+                dateSkip = dt;
+            else throw new FormatException("Could not decode the Skip Date.");
+
+            Array.Clear(stringBuffer, 0, 20);
+            stream.Read(stringBuffer, 0, 19);
+            if (DateTime.TryParseExact(string.Join("", Encoding.ASCII.GetString(stringBuffer).TakeWhile(c => c != '\0')), "HH:mm:ss dd.MM.yyyy", new CultureInfo("ro-RO"), DateTimeStyles.None, out dt))
+                dateReturn = dt;
+            else throw new FormatException("Could not decode the Return Date.");
         }
 
         public static bool operator ==(TruckInfo one, TruckInfo other) {
-            return one.nrCrt == other.nrCrt && one.nrAuto == other.nrAuto && one.payload == other.payload && one.dateEntry == other.dateEntry && one.dateRegistered == other.dateRegistered && one.comments == other.comments;
+            return one.nrCrt == other.nrCrt && one.nrAuto == other.nrAuto && one.payload == other.payload && one.dateEntry == other.dateEntry && one.dateRegistered == other.dateRegistered && one.comments == other.comments && one.dateSkip == other.dateSkip;
         }
 
         public static bool operator !=(TruckInfo one, TruckInfo other) {

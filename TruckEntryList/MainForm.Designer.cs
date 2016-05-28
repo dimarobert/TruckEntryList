@@ -63,9 +63,11 @@
             this.lstSkip = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuSkipList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cmdReturnToList = new System.Windows.Forms.ToolStripMenuItem();
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.dateSkip = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuTruckList.SuspendLayout();
             this.mnuSkipList.SuspendLayout();
             this.SuspendLayout();
@@ -157,14 +159,15 @@
             this.nrcrt,
             this.nrAuto,
             this.payload,
-            this.dateReg});
+            this.dateReg,
+            this.dateSkip});
             this.lstTruckOrder.FullRowSelect = true;
             this.lstTruckOrder.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1});
             this.lstTruckOrder.Location = new System.Drawing.Point(228, 12);
             this.lstTruckOrder.MultiSelect = false;
             this.lstTruckOrder.Name = "lstTruckOrder";
-            this.lstTruckOrder.Size = new System.Drawing.Size(319, 230);
+            this.lstTruckOrder.Size = new System.Drawing.Size(425, 230);
             this.lstTruckOrder.TabIndex = 6;
             this.lstTruckOrder.UseCompatibleStateImageBehavior = false;
             this.lstTruckOrder.View = System.Windows.Forms.View.Details;
@@ -196,10 +199,17 @@
             "Rapita",
             "Floarea Soarelui",
             "Soia",
-            "Biodiesel",
             "Srot",
+            "Srot Rapita",
+            "Srot FLS",
+            "Srot Soia",
+            "Biodiesel",
+            "Glicerina",
             "Metanol",
-            "Glicerina"});
+            "Soapstock",
+            "Gume",
+            "Coaja",
+            "Ulei"});
             this.txtPayload.Location = new System.Drawing.Point(122, 78);
             this.txtPayload.Name = "txtPayload";
             this.txtPayload.Size = new System.Drawing.Size(100, 21);
@@ -274,14 +284,15 @@
             this.lstSkip.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
             this.columnHeader2,
-            this.columnHeader3});
+            this.columnHeader3,
+            this.columnHeader4});
             this.lstSkip.FullRowSelect = true;
             this.lstSkip.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem2});
-            this.lstSkip.Location = new System.Drawing.Point(553, 12);
+            this.lstSkip.Location = new System.Drawing.Point(659, 12);
             this.lstSkip.MultiSelect = false;
             this.lstSkip.Name = "lstSkip";
-            this.lstSkip.Size = new System.Drawing.Size(208, 230);
+            this.lstSkip.Size = new System.Drawing.Size(325, 230);
             this.lstSkip.TabIndex = 104;
             this.lstSkip.UseCompatibleStateImageBehavior = false;
             this.lstSkip.View = System.Windows.Forms.View.Details;
@@ -296,6 +307,11 @@
             // 
             this.columnHeader2.Text = "Nr. Auto";
             this.columnHeader2.Width = 77;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Observatii";
+            this.columnHeader3.Width = 80;
             // 
             // mnuSkipList
             // 
@@ -312,16 +328,21 @@
             this.cmdReturnToList.Text = "Adauga la inceput";
             this.cmdReturnToList.Click += new System.EventHandler(this.cmdReturnToList_Click);
             // 
-            // columnHeader3
+            // dateSkip
             // 
-            this.columnHeader3.Text = "Observatii";
-            this.columnHeader3.Width = 80;
+            this.dateSkip.Text = "Ora Intoarcere";
+            this.dateSkip.Width = 116;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Ora Sarit";
+            this.columnHeader4.Width = 116;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(769, 254);
+            this.ClientSize = new System.Drawing.Size(990, 254);
             this.Controls.Add(this.lstSkip);
             this.Controls.Add(this.cmdSkip);
             this.Controls.Add(this.cmdRaport);
@@ -381,6 +402,8 @@
         private System.Windows.Forms.ToolStripMenuItem cmdReturnToList;
         private System.Windows.Forms.ContextMenuStrip mnuSkipList;
         private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader dateSkip;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
     }
 }
 

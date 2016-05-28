@@ -50,8 +50,7 @@ namespace TruckEntryList {
             get { return autoIncrementNrCrt; }
             set {
                 autoIncrementNrCrt = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("AutoIncrementNrCrt"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("AutoIncrementNrCrt"));
             }
         }
 
@@ -179,8 +178,14 @@ namespace TruckEntryList {
                 excelWs.Cells[3, 5] = "Data Intrare";
                 AddBorder(excelWs.Cells[3, 5], XlBorderWeight.xlThick);
 
-                excelWs.Cells[3, 6] = "Comentarii";
+                excelWs.Cells[3, 6] = "Data Sarit";
                 AddBorder(excelWs.Cells[3, 6], XlBorderWeight.xlThick);
+
+                excelWs.Cells[3, 7] = "Data Intoarcere";
+                AddBorder(excelWs.Cells[3, 7], XlBorderWeight.xlThick);
+
+                excelWs.Cells[3, 8] = "Comentarii";
+                AddBorder(excelWs.Cells[3, 8], XlBorderWeight.xlThick);
 
                 int i = 1;
 
@@ -196,13 +201,15 @@ namespace TruckEntryList {
                         excelWs.Cells[3 + i, 3] = ti.payload;
                         excelWs.Cells[3 + i, 4] = ti.dateRegistered;
                         excelWs.Cells[3 + i, 5] = ti.dateEntry;
-                        excelWs.Cells[3 + i, 6] = ti.comments;
+                        excelWs.Cells[3 + i, 6] = ti.dateSkip == DateTime.MinValue ? "" : ti.dateSkip.ToString("HH:mm:ss dd.MM.yyyy");
+                        excelWs.Cells[3 + i, 7] = ti.dateReturn == DateTime.MinValue ? "" : ti.dateReturn.ToString("HH:mm:ss dd.MM.yyyy");
+                        excelWs.Cells[3 + i, 8] = ti.comments;
                         i++;
                     }
                 }
 
                 if (i != 1)
-                    AddBorder(excelWs.get_Range("A4", "E" + (i + 2)), XlBorderWeight.xlThin, true, true);
+                    AddBorder(excelWs.get_Range("A4", "H" + (i + 2)), XlBorderWeight.xlThin, true, true);
                 else {
                     // Nu avem nimic de raportat. ABORT
                     MessageBox.Show("Raportul pe data " + dataRaport + " este gol. Raportul nu a fost salvat.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -218,7 +225,7 @@ namespace TruckEntryList {
                     rr.ColumnWidth = rr.ColumnWidth + 2;
                 }
 
-                r = excelWs.get_Range("A3", "E" + (i + 2));
+                r = excelWs.get_Range("A3", "H" + (i + 2));
                 r.HorizontalAlignment = XlHAlign.xlHAlignCenter;
 
 
@@ -347,6 +354,11 @@ namespace TruckEntryList {
             lvsi.Text = entry.dateRegistered.ToString("HH:mm:ss dd.MM.yyyy");
             lvi.SubItems.Add(lvsi);
 
+            if (entry.dateReturn != null && entry.dateReturn > DateTime.MinValue) {
+                lvsi = new ListViewItem.ListViewSubItem();
+                lvsi.Text = entry.dateReturn.ToString("HH:mm:ss dd.MM.yyyy");
+                lvi.SubItems.Add(lvsi);
+            }
 
             lstTruckOrder.Items.Add(lvi);
         }
@@ -362,6 +374,12 @@ namespace TruckEntryList {
             lvsi = new ListViewItem.ListViewSubItem();
             lvsi.Text = entry.comments;
             lvi.SubItems.Add(lvsi);
+
+            if (entry.dateSkip != null && entry.dateSkip > DateTime.MinValue) {
+                lvsi = new ListViewItem.ListViewSubItem();
+                lvsi.Text = entry.dateSkip.ToString("HH:mm:ss dd.MM.yyyy");
+                lvi.SubItems.Add(lvsi);
+            }
 
             lstSkip.Items.Add(lvi);
         }
@@ -381,6 +399,12 @@ namespace TruckEntryList {
             lvsi = new ListViewItem.ListViewSubItem();
             lvsi.Text = entry.dateRegistered.ToString("HH:mm:ss dd.MM.yyyy");
             lvi.SubItems.Add(lvsi);
+
+            if (entry.dateReturn != null && entry.dateReturn > DateTime.MinValue) {
+                lvsi = new ListViewItem.ListViewSubItem();
+                lvsi.Text = entry.dateReturn.ToString("HH:mm:ss dd.MM.yyyy");
+                lvi.SubItems.Add(lvsi);
+            }
 
             lstTruckOrder.Items.Insert(0, lvi);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EntryData"));
@@ -494,10 +518,11 @@ namespace TruckEntryList {
             if (cForm.DialogResult == DialogResult.OK) {
                 entry.comments = cForm.Comment;
             }
-
+            entry.dateSkip = DateTime.Now;
             AddSkipToFile(entry);
             AddToSkipList(entry);
             SkipData.Add(entry);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SkipData"));
 
             using (FixedObjectFileStream stream = new FixedObjectFileStream(dataFile, FileMode.Open, FileAccess.ReadWrite)) {
                 stream.RemoveAt(0);
@@ -610,6 +635,7 @@ namespace TruckEntryList {
                 var entry = SkipData[lstSkip.SelectedIndices[0]];
                 entry.nrCrt = 1;
 
+                entry.dateReturn = DateTime.Now;
                 RestoreToList(entry);
                 AddEntryToFile(entry, true);
                 EntryData.Insert(0, entry);
@@ -633,6 +659,7 @@ namespace TruckEntryList {
                     lstSkip.Items.Remove(lstSkip.SelectedItems[0]);
 
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EntryData"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SkipData"));
             }
         }
     }
